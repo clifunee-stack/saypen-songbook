@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>쫑알쫑알 똘똘이 - 세이펜 사운드 카드</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;800&family=Nanum+Round+Gothic:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Nanum Round Gothic', 'Pretendard', sans-serif;
+      background-color: #f1f5f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      padding: 20px;
+    }
+    .print-bar {
+      width: 297mm;
+      max-width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #ffffff;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .print-btn {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .print-btn:hover { background: #2563eb; }
+    
+    /* A4 가로 2페이지 시트 */
+    .a4-sheet-landscape {
+      width: 297mm; height: 210mm; min-height: 210mm;
+      background: #ffffff; box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+      border-radius: 4px; box-sizing: border-box;
+      display: flex; position: relative; overflow: hidden;
+      page-break-after: always; break-after: page;
+    }
+    .a4-half-page {
+      width: 148.5mm; height: 210mm; box-sizing: border-box;
+      padding: 8mm 6mm 8mm 14mm; display: flex; flex-direction: column; position: relative;
+    }
+    .center-cut-line {
+      position: absolute; left: 148.5mm; top: 0; bottom: 0; width: 0;
+      border-left: 1.5px dashed #94a3b8; z-index: 50; pointer-events: none;
+    }
+    .center-cut-marker-top, .center-cut-marker-bottom {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      background: #ffffff; padding: 1px 4px; font-size: 10px; color: #64748b; font-weight: 700;
+      white-space: nowrap;
+    }
+    .center-cut-marker-top { top: 2mm; }
+    .center-cut-marker-bottom { bottom: 2mm; }
+
+    /* A4 세로 1페이지 시트 */
+    .a4-sheet-portrait {
+      width: 210mm; height: 297mm; min-height: 297mm;
+      background: #ffffff; box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+      border-radius: 4px; box-sizing: border-box;
+      display: flex; align-items: center; justify-content: center; position: relative;
+      page-break-after: always; break-after: page;
+    }
+    .a4-single-a5-wrap {
+      width: 148mm; height: 210mm; box-sizing: border-box;
+      padding: 8mm 6mm 8mm 14mm; display: flex; flex-direction: column; position: relative;
+      outline: 1.5px dashed #94a3b8;
+    }
+    .single-cut-tag {
+      position: absolute; background: #ffffff; padding: 1px 4px; font-size: 9px; color: #64748b; font-weight: 700; z-index: 20;
+    }
+    .single-cut-tag-top { top: -9px; left: 10px; }
+    .single-cut-tag-bottom { bottom: -9px; right: 10px; }
+
+    /* 타공 가이드 */
+    .punch-guide-container {
+      position: absolute; left: 4mm; top: 0; bottom: 0; width: 5mm;
+      display: flex; flex-direction: column; justify-content: space-evenly; align-items: center;
+      pointer-events: none; z-index: 40;
+    }
+    .punch-dot {
+      width: 3.5mm; height: 3.5mm; border: 1px dashed #cbd5e1; border-radius: 50%; background: rgba(241, 245, 249, 0.4);
+    }
+
+    /* A5 공통 규격 */
+    .a5-page {
+      width: 148mm; height: 210mm; min-height: 210mm;
+      background: #ffffff; box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+      border-radius: 4px; padding: 8mm 6mm 8mm 14mm; box-sizing: border-box;
+      display: flex; flex-direction: column; position: relative; overflow: hidden;
+      page-break-after: always; break-after: page;
+    }
+    .a5-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-bottom: 2.5mm; border-bottom: 2px solid #e2e8f0; margin-bottom: 3mm;
+    }
+    .a5-header-left { display: flex; align-items: center; gap: 8px; }
+    .a5-character-badge {
+      width: 11mm; height: 11mm; background: #fef08a; border: 2px solid #38bdf8;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px;
+    }
+    .a5-title-text { font-size: 18px; font-weight: 800; color: #1e293b; }
+    .a5-header-play-btn {
+      width: 9mm; height: 9mm; background: #ef4444; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;
+    }
+    .a5-grid-8 {
+      display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(4, 1fr);
+      gap: 3mm 4mm; flex: 1; height: calc(100% - 16mm);
+    }
+    .a5-grid-6 {
+      display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr);
+      gap: 4mm 5mm; flex: 1; height: calc(100% - 16mm);
+    }
+    .a5-grid-4 {
+      display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(2, 1fr);
+      gap: 6mm 6mm; flex: 1; height: calc(100% - 16mm);
+    }
+    .a5-card { display: flex; flex-direction: column; position: relative; }
+    .a5-card-thumb-wrap {
+      position: relative; width: 100%; height: 0; padding-top: 56.25%;
+      background: #e2e8f0; border-radius: 4px; overflow: hidden;
+    }
+    .a5-card-thumb-wrap img {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;
+    }
+    .a5-saypen-sticker-tag {
+      position: absolute; top: 2px; left: 2px; background: rgba(255, 255, 255, 0.92);
+      color: #b45309; font-size: 8px; font-weight: 800; padding: 1px 4px; border-radius: 3px; border: 1px solid #fcd34d;
+    }
+    .a5-card-title {
+      margin-top: 2mm; font-size: 12px; font-weight: 800; color: #334155;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .card-hover-tools { display: none !important; }
+
+    @page { size: A4 landscape; margin: 0; }
+    @media print {
+      body { background: white !important; padding: 0 !important; margin: 0 !important; }
+      .print-bar { display: none !important; }
+      .a4-sheet-landscape {
+        width: 297mm !important; height: 210mm !important; border: none !important; box-shadow: none !important;
+        page-break-after: always !important; break-after: page !important;
+        -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;
+      }
+      .a4-sheet-portrait {
+        width: 210mm !important; height: 297mm !important; border: none !important; box-shadow: none !important;
+        page-break-after: always !important; break-after: page !important;
+        -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;
+      }
+      .a5-page {
+        width: 148mm !important; height: 210mm !important; border: none !important; box-shadow: none !important;
+        page-break-after: always !important; break-after: page !important;
+        -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;
+      }
+      .center-cut-line, .single-cut-tag, .punch-dot {
+        -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="print-bar">
+    <div><strong>쫑알쫑알 똘똘이</strong> (사운드 카드)</div>
+    <button class="print-btn" onclick="window.print()">🖨️ A4/A5 인쇄 / PDF 저장</button>
+  </div>
+  <div class="a4-sheet-landscape"><div class="a4-half-page"><div style="width: 100%; height: 100%; display: flex; flex-direction: column; position: relative; padding-left: 16mm; padding-right: 6mm;"><div class="a5-header">
+    <div class="a5-header-left">
+      <div class="a5-character-badge">🎵</div>
+      <div class="a5-title-text">쫑알쫑알 똘똘이</div>
+    </div>
+    
+  </div><div class="a5-grid-8"><div class="a5-card" data-idx="0">
+      <div class="card-hover-tools no-print">
+        
+        <button class="card-tool-btn btn-move-next" title="뒤로 이동">▼</button>
+        <button class="card-tool-btn btn-remove-card" title="카드 삭제">✕</button>
+      </div>
+
+      <div class="a5-card-thumb-wrap">
+        <img src="/downloads/REC1_01013.jpg" alt="똘똘이 쫑알쫑알 똘똘이 오프닝" onerror="this.src='https://placehold.co/320x180/e2e8f0/475569?text=%EB%98%98%EB%98%98%EC%9D%B4%20%EC%AB%91%EC%95%8C%EC%AB%91%EC%95%8C%20%EB%98%98%EB%98%98%EC%9D%B4%20%EC%98%A4%ED%94%84%EB%8B%9D'">
+        <div class="a5-saypen-sticker-tag">REC1_01013</div>
+      </div>
+
+      <div class="a5-card-title" contenteditable="true" spellcheck="false" title="클릭하여 제목 수정 가능">
+        똘똘이 쫑알쫑알 똘똘이 오프닝
+      </div>
+    </div><div class="a5-card" data-idx="1">
+      <div class="card-hover-tools no-print">
+        <button class="card-tool-btn btn-move-prev" title="앞으로 이동">▲</button>
+        <button class="card-tool-btn btn-move-next" title="뒤로 이동">▼</button>
+        <button class="card-tool-btn btn-remove-card" title="카드 삭제">✕</button>
+      </div>
+
+      <div class="a5-card-thumb-wrap">
+        <img src="/downloads/REC1_01014.jpg" alt="똘똘이 하트 하트 앙" onerror="this.src='https://placehold.co/320x180/e2e8f0/475569?text=%EB%98%98%EB%98%98%EC%9D%B4%20%ED%95%98%ED%8A%B8%20%ED%95%98%ED%8A%B8%20%EC%95%99'">
+        <div class="a5-saypen-sticker-tag">REC1_01014</div>
+      </div>
+
+      <div class="a5-card-title" contenteditable="true" spellcheck="false" title="클릭하여 제목 수정 가능">
+        똘똘이 하트 하트 앙
+      </div>
+    </div><div class="a5-card" data-idx="2">
+      <div class="card-hover-tools no-print">
+        <button class="card-tool-btn btn-move-prev" title="앞으로 이동">▲</button>
+        <button class="card-tool-btn btn-move-next" title="뒤로 이동">▼</button>
+        <button class="card-tool-btn btn-remove-card" title="카드 삭제">✕</button>
+      </div>
+
+      <div class="a5-card-thumb-wrap">
+        <img src="/downloads/REC1_01015.jpg" alt="똘똘이 생일 축하 송" onerror="this.src='https://placehold.co/320x180/e2e8f0/475569?text=%EB%98%98%EB%98%98%EC%9D%B4%20%EC%83%9D%EC%9D%BC%20%EC%B6%95%ED%95%98%20%EC%86%A1'">
+        <div class="a5-saypen-sticker-tag">REC1_01015</div>
+      </div>
+
+      <div class="a5-card-title" contenteditable="true" spellcheck="false" title="클릭하여 제목 수정 가능">
+        똘똘이 생일 축하 송
+      </div>
+    </div><div class="a5-card" data-idx="3">
+      <div class="card-hover-tools no-print">
+        <button class="card-tool-btn btn-move-prev" title="앞으로 이동">▲</button>
+        <button class="card-tool-btn btn-move-next" title="뒤로 이동">▼</button>
+        <button class="card-tool-btn btn-remove-card" title="카드 삭제">✕</button>
+      </div>
+
+      <div class="a5-card-thumb-wrap">
+        <img src="/downloads/REC1_01016.jpg" alt="똘똘이 신호등" onerror="this.src='https://placehold.co/320x180/e2e8f0/475569?text=%EB%98%98%EB%98%98%EC%9D%B4%20%EC%8B%A0%ED%98%B8%EB%93%B1'">
+        <div class="a5-saypen-sticker-tag">REC1_01016</div>
+      </div>
+
+      <div class="a5-card-title" contenteditable="true" spellcheck="false" title="클릭하여 제목 수정 가능">
+        똘똘이 신호등
+      </div>
+    </div><div class="a5-card" data-idx="4">
+      <div class="card-hover-tools no-print">
+        <button class="card-tool-btn btn-move-prev" title="앞으로 이동">▲</button>
+        <button class="card-tool-btn btn-move-next" title="뒤로 이동">▼</button>
+        <button class="card-tool-btn btn-remove-card" title="카드 삭제">✕</button>
+      </div>
+
+      <div class="a5-card-thumb-wrap">
+        <img src="/downloads/REC1_01017.jpg" alt="똘똘이 귀여운 아가 똥" onerror="this.src='https://placehold.co/320x180/e2e8f0/475569?text=%EB%98%98%EB%98%98%EC%9D%B4%20%EA%B7%80%EC%97%AC%EC%9A%B4%20%EC%95%84%EA%B0%80%20%EB%98%A5'">
+        <div class="a5-saypen-sticker-tag">REC1_01017</div>
+      </div>
+
+      <div class="a5-card-title" contenteditable="true" spellcheck="false" title="클릭하여 제목 수정 가능">
+        똘똘이 귀여운 아가 똥
+      </div>
+    </div><div class="a5-card" data-idx="5">
+      <div class="card-hover-tools no-print">
+        <button class="card-tool-btn btn-move-prev" title="앞으로 이동">▲</button>
+        <button class="card-tool-btn btn-move-next" title="뒤로 이동">▼</button>
+        <button class="card-tool-btn btn-remove-card" title="카드 삭제">✕</button>
+      </div>
+
+      <div class="a5-card-thumb-wrap">
+        <img src="/downloads/REC1_01018.jpg" alt="똘똘이 반짝 반짝 작은 별 자장가" onerror="this.src='https://placehold.co/320x180/e2e8f0/475569?text=%EB%98%98%EB%98%98%EC%9D%B4%20%EB%B0%98%EC%A7%9D%20%EB%B0%98%EC%A7%9D%20%EC%9E%91%EC%9D%80%20%EB%B3%84%20%EC%9E%90%EC%9E%A5%EA%B0%80'">
+        <div class="a5-saypen-sticker-tag">REC1_01018</div>
+      </div>
+
+      <div class="a5-card-title" contenteditable="true" spellcheck="false" title="클릭하여 제목 수정 가능">
+        똘똘이 반짝 반짝 작은 별 자장가
+      </div>
+    </div><div class="a5-card" data-idx="6">
+      <div class="card-hover-tools no-print">
+        <button class="card-tool-btn btn-move-prev" title="앞으로 이동">▲</button>
+        <button class="card-tool-btn btn-move-next" title="뒤로 이동">▼</button>
+        <button class="card-tool-btn btn-remove-card" title="카드 삭제">✕</button>
+      </div>
+
+      <div class="a5-card-thumb-wrap">
+        <img src="/downloads/REC1_01019.jpg" alt="똘똘이 흥! 칫! 뿡!" onerror="this.src='https://placehold.co/320x180/e2e8f0/475569?text=%EB%98%98%EB%98%98%EC%9D%B4%20%ED%9D%A5!%20%EC%B9%AB!%20%EB%BF%A1!'">
+        <div class="a5-saypen-sticker-tag">REC1_01019</div>
+      </div>
+
+      <div class="a5-card-title" contenteditable="true" spellcheck="false" title="클릭하여 제목 수정 가능">
+        똘똘이 흥! 칫! 뿡!
+      </div>
+    </div><div class="a5-card" data-idx="7">
+      <div class="card-hover-tools no-print">
+        <button class="card-tool-btn btn-move-prev" title="앞으로 이동">▲</button>
+        
+        <button class="card-tool-btn btn-remove-card" title="카드 삭제">✕</button>
+      </div>
+
+      <div class="a5-card-thumb-wrap">
+        <img src="/downloads/REC1_01020.jpg" alt="똘똘이 안녕이드앙" onerror="this.src='https://placehold.co/320x180/e2e8f0/475569?text=%EB%98%98%EB%98%98%EC%9D%B4%20%EC%95%88%EB%85%95%EC%9D%B4%EB%93%9C%EC%95%99'">
+        <div class="a5-saypen-sticker-tag">REC1_01020</div>
+      </div>
+
+      <div class="a5-card-title" contenteditable="true" spellcheck="false" title="클릭하여 제목 수정 가능">
+        똘똘이 안녕이드앙
+      </div>
+    </div></div></div></div><div class="center-cut-line">
+          <div class="center-cut-marker-top">✂️ 자르는 선</div>
+          <div class="center-cut-marker-bottom">✂️ 자르는 선</div>
+        </div><div class="a4-half-page" style="visibility: hidden;"></div></div>
+</body>
+</html>

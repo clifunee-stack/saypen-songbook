@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>세이펜 송북 메이커 & 유튜브 다운로더</title>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#4a6fa5">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3844/3844724.png">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Jua&family=Nanum+Myeongjo:wght@700;800&family=Nanum+Round+Gothic:wght@700;800&family=Pretendard:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- 모바일 PWA 앱 설치 프로모션 바 (PWA 지원 브라우저에서 자동 노출) -->
+  <div id="pwa-install-banner" class="pwa-banner no-print hidden">
+    <div class="pwa-banner-content">
+      <span class="pwa-icon">📱</span>
+      <span>스마트폰 홈 화면에 <strong>세이펜 송북 앱</strong>을 추가해보세요!</span>
+    </div>
+    <button id="btn-pwa-install" class="btn btn-sm btn-primary">앱으로 설치</button>
+  </div>
+
+  <!-- 최상단 헤더 네비게이션 (화면용, 인쇄 시 자동 숨김) -->
+  <header class="app-header no-print">
+    <div class="header-inner">
+      <div class="logo-area">
+        <span class="logo-icon">🎵</span>
+        <div class="logo-text">
+          <h1>세이펜 송북 메이커</h1>
+          <p>유튜브 음원·썸네일 자동 다운로드 & 바인더 사운드 카드(132×208mm / A5) 제작</p>
+        </div>
+      </div>
+      <nav class="nav-tabs">
+        <button class="tab-btn active" data-tab="tab-download">
+          <span>📥</span> 1. 음원 & 썸네일 다운로드
+        </button>
+        <button class="tab-btn" data-tab="tab-songbook">
+          <span>📖</span> 2. 바인더 송북 제작
+        </button>
+        <button class="tab-btn" data-tab="tab-history">
+          <span>📋</span> 3. 매핑 & 다운로드 기록
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <!-- ============================================== -->
+    <!-- 탭 1: 음원 및 썸네일 다운로드 (후보 3개 선택 모드) -->
+    <!-- ============================================== -->
+    <section id="tab-download" class="tab-content active no-print">
+      <div class="card panel-card">
+        <div class="panel-header">
+          <h2>🎯 키워드 입력 및 세이펜 코드 설정</h2>
+          <span class="badge badge-info">후보 3개 선택 모드</span>
+        </div>
+
+        <div class="form-grid">
+          <!-- 좌측: 키워드 입력 (라인 번호 포함) -->
+          <div class="form-group col-span-2">
+            <div class="label-row">
+              <div class="label-with-count">
+                <label for="keywords-input"><strong>검색 키워드 목록</strong> (한 줄에 하나씩 입력)</label>
+                <span id="keyword-count-badge" class="badge badge-info">0곡 입력됨</span>
+              </div>
+              <button type="button" id="btn-load-sample" class="btn-text">💡 뽀로로 예시 불러오기</button>
+            </div>
+            <div class="editor-wrap">
+              <div id="line-numbers" class="line-numbers">1</div>
+              <textarea id="keywords-input" rows="7" placeholder="다운로드할 노래 제목이나 키워드를 줄바꿈으로 입력하세요.&#10;예시:&#10;뽀롱뽀롱 뽀로로 오프닝곡&#10;개굴개굴개구리&#10;거미가 줄을타고&#10;나비야 나비야&#10;곰 세마리&#10;달팽이 집을 지읍시다&#10;엄마 돼지 아기 돼지&#10;머리 어깨 무릎 발"></textarea>
+            </div>
+            <p class="help-text">유튜브 URL을 입력하셔도 됩니다.</p>
+          </div>
+
+          <!-- 우측: 캐릭터 이름 및 시작 번호 설정 -->
+          <div class="form-group">
+            <label for="character-name"><strong>🐧 캐릭터 / 시리즈 이름</strong></label>
+            <input type="text" id="character-name" value="" placeholder="예: 뽀로로, 핑크퐁, 주니토니, 슈퍼윙스">
+            <p class="help-text">입력 시 "[키워드] + [캐릭터명]"으로 자동 검색됩니다.</p>
+          </div>
+
+          <div class="form-group">
+            <label for="saypen-start-num"><strong>🔢 시작 스티커 번호</strong></label>
+            <input type="text" id="saypen-start-num" value="1000" placeholder="예: 1000">
+            <p class="help-text">구매하신 오디오렉 스티커의 시작 번호 (1씩 자동 증가)</p>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <button id="btn-search" class="btn btn-primary btn-lg">
+            <span>🔍</span> 상위 3개 영상 후보 검색하기
+          </button>
+        </div>
+      </div>
+
+      <!-- 로딩 인디케이터 -->
+      <div id="search-loading" class="loading-box hidden">
+        <div class="spinner"></div>
+        <p id="search-loading-text">유튜브에서 최적의 영상 후보를 검색 중입니다... 잠시만 기다려주세요.</p>
+      </div>
+
+      <!-- 후보 선택 영역 -->
+      <div id="candidates-container" class="candidates-container hidden">
+        <div class="section-title-row">
+          <div>
+            <h3>🎬 검색된 영상 후보 확인 및 선택</h3>
+            <p class="section-sub">각 키워드별로 마음에 드는 영상을 선택하세요. (기본으로 적정 길이의 최적 영상이 선택되어 있습니다.)</p>
+          </div>
+          <button id="btn-start-download" class="btn btn-success btn-lg">
+            <span>🚀</span> 선택한 영상 일괄 다운로드 시작
+          </button>
+        </div>
+
+        <div id="candidates-list" class="candidates-list">
+          <!-- JS 동적 렌더링 -->
+        </div>
+
+        <div class="action-row mt-4">
+          <button id="btn-start-download-bottom" class="btn btn-success btn-lg">
+            <span>🚀</span> 선택한 영상 일괄 다운로드 시작
+          </button>
+        </div>
+      </div>
+
+      <!-- 다운로드 진행 상태 모달/창 -->
+      <div id="download-progress-box" class="progress-box hidden">
+        <h3>📥 음원 변환 및 썸네일 다운로드 진행 중</h3>
+        <div class="progress-bar-wrap">
+          <div id="progress-bar-fill" class="progress-bar-fill" style="width: 0%;"></div>
+        </div>
+        <div class="progress-status-text">
+          <span id="progress-current-item">준비 중...</span>
+          <span id="progress-percent">0%</span>
+        </div>
+      </div>
+
+      <!-- 다운로드 완료 안내 및 바로가기 -->
+      <div id="download-complete-box" class="complete-box hidden">
+        <div class="complete-header">
+          <span class="check-icon">🎉</span>
+          <div>
+            <h3>다운로드가 완료되었습니다!</h3>
+            <p id="download-summary-text">총 8곡 중 8곡 성공</p>
+          </div>
+        </div>
+        <div class="btn-group">
+          <button id="btn-go-songbook" class="btn btn-primary btn-lg">
+            <span>📖</span> 바로 A5 바인더 송북 만들기
+          </button>
+          <button id="btn-browser-download-all" class="btn btn-secondary btn-lg">
+            <span>📦</span> 음원 & 이미지 브라우저 저장
+          </button>
+          <button id="btn-open-folder" class="btn btn-outline">
+            <span>📁</span> PC 폴더 열기
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- 탭 2: A5 바인더 송북 제작 & 인쇄 (업로드 사진 완벽 재현) -->
+    <!-- ============================================== -->
+    <section id="tab-songbook" class="tab-content">
+      <!-- 편집 컨트롤 패널 (화면에서만 표시, 인쇄 시 숨김) -->
+      <div class="card panel-card no-print">
+        <div class="panel-header">
+          <h2>🎨 A5 바인더 사운드 카드 설정 및 편집</h2>
+          <div class="btn-group">
+            <button id="btn-print-songbook" class="btn btn-primary">
+              <span>🖨️</span> A5 규격 인쇄 / PDF 저장
+            </button>
+            <button id="btn-export-html" class="btn btn-secondary">
+              <span>💾</span> 독립형 HTML 파일 저장
+            </button>
+          </div>
+        </div>
+
+        <div class="songbook-controls-grid">
+          <div class="control-item">
+            <label for="book-title"><strong>카드 상단 타이틀 (Title)</strong></label>
+            <input type="text" id="book-title" value="뽀로로 사운드 카드" placeholder="예: 뽀로로 사운드 카드">
+          </div>
+
+          <div class="control-item">
+            <label for="book-font"><strong>송북 글꼴 (5종 폰트 선택)</strong></label>
+            <select id="book-font">
+              <option value="font-nanum-round" selected>나눔라운드고딕 (기본 동글이)</option>
+              <option value="font-pretendard">프리텐다드 (깔끔 고딕)</option>
+              <option value="font-jua">배달의민족 주아 (굵고 귀여운 붓글씨)</option>
+              <option value="font-gaegu">개구쟁이체 (아기자기 손글씨)</option>
+              <option value="font-myeongjo">나눔명조 (단정한 감성 서체)</option>
+            </select>
+          </div>
+
+          <div class="control-item">
+            <label for="book-icon-type"><strong>대표 캐릭터 아이콘</strong></label>
+            <select id="book-icon-type">
+              <option value="🐧" selected>🐧 뽀로로 펭귄</option>
+              <option value="⭐">⭐ 반짝 별</option>
+              <option value="🎵">🎵 음표 멜로디</option>
+              <option value="🐻">🐻 곰돌이</option>
+              <option value="🐸">🐸 개구리</option>
+              <option value="🚗">🚗 꼬마 자동차</option>
+              <option value="custom">✏️ 직접 입력</option>
+            </select>
+          </div>
+
+          <div class="control-item">
+            <label for="cards-per-page"><strong>한 페이지당 카드 개수</strong></label>
+            <select id="cards-per-page">
+              <option value="8" selected>8개 (2열 × 4행, 바인더 최적 기본)</option>
+              <option value="6">6개 (2열 × 3행, 큼직한 카드)</option>
+              <option value="4">4개 (2열 × 2행, 유아용 대형 카드)</option>
+            </select>
+          </div>
+
+          <div class="control-item">
+            <label for="binder-margin"><strong>바인더 타공 여백 (왼쪽 여백)</strong></label>
+            <div class="range-wrap">
+              <input type="range" id="binder-margin" min="0" max="25" value="12" step="1">
+              <span id="binder-margin-val">12mm</span>
+            </div>
+          </div>
+
+          <div class="control-item">
+            <label for="print-paper-type"><strong>인쇄 용지 규격 (바인더 132×208mm)</strong></label>
+            <select id="print-paper-type">
+              <option value="a4-double-132" selected>📄 A4 가로 2Page (바인더 132×208mm 재단 점선) [추천]</option>
+              <option value="a4-single-132">📄 A4 세로 1Page (바인더 132×208mm 재단 점선)</option>
+              <option value="a4-full-portrait">📄 A4 세로 전면 페이지 (210×297mm 꽉 찬 인쇄)</option>
+              <option value="a5-direct">📑 A5 용지 직접 인쇄 (148×210mm)</option>
+            </select>
+          </div>
+
+          <div class="control-item-checkbox">
+            <label class="checkbox-label">
+              <input type="checkbox" id="show-cut-lines" checked>
+              <span>✂️ 자르는 점선 표시 (132×208mm 규격 테두리)</span>
+            </label>
+          </div>
+
+          <div class="control-item-checkbox">
+            <label class="checkbox-label">
+              <input type="checkbox" id="show-punch-guide" checked>
+              <span>📍 바인더 6공 타공(펀칭) 가이드 표시</span>
+            </label>
+          </div>
+
+          <div class="control-item-checkbox">
+            <label class="checkbox-label">
+              <input type="checkbox" id="show-saypen-code" checked>
+              <span>원형 스티커 가이드라인 (썸네일 우측 하단)</span>
+            </label>
+          </div>
+
+          <div class="control-item-checkbox">
+            <label class="checkbox-label">
+              <input type="checkbox" id="show-play-icon" checked>
+              <span>우측 전체 재생 아이콘 (▶) 표시</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="tip-box">
+          <p>💡 <strong>132×208mm 바인더 맞춤 인쇄 안내:</strong> [A4 가로 2Page]를 선택하시면 A4 1장에 좌/우 2개의 바인더 내지가 배치되며, '자르는선' 문구 없이 <strong>132×208mm 크기의 깔끔한 점선</strong>만 인쇄됩니다. 점선을 따라 자르시면 바인더에 정확히 맞습니다!</p>
+        </div>
+      </div>
+
+      <!-- 실제 A5 바인더 인쇄 프리뷰 영역 -->
+      <div class="print-preview-wrapper">
+        <div id="pages-container" class="pages-container">
+          <!-- A5 페이지들이 JS에 의해 8개 단위로 동적 생성됨 -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- 탭 3: 세이펜 코드 매핑 & 실패 추적 기록 -->
+    <!-- ============================================== -->
+    <section id="tab-history" class="tab-content no-print">
+      <div class="card panel-card">
+        <div class="panel-header">
+          <div>
+            <h2>📋 세이펜 코드 매핑 및 다운로드 기록</h2>
+            <p class="section-sub">세이펜 코드, 검색 키워드, 실제 유튜브 영상 제목, 성공/실패 내역을 영구 비교 관리합니다.</p>
+          </div>
+          <div class="btn-group">
+            <button id="btn-add-history-row" class="btn btn-primary">➕ 새 행 추가</button>
+            <button id="btn-refresh-history" class="btn btn-outline">🔄 새로고침</button>
+            <button id="btn-open-folder-history" class="btn btn-outline">📁 폴더 열기</button>
+            <a id="btn-download-csv" href="/downloads/mapping_history.csv" download="mapping_history.csv" class="btn btn-secondary">
+              📊 CSV 다운로드
+            </a>
+          </div>
+        </div>
+
+        <div class="tip-box" style="margin-bottom: 1rem;">
+          <p>💡 <strong>엑셀 없이 웹에서 바로 편집:</strong> [✏️ 수정] 버튼을 누르면 세이펜 코드, 곡 제목, 파일명을 엑셀 없이 브라우저에서 바로 고칠 수 있습니다. 수정 후 [💾 저장]을 누르면 <code>mapping_history.csv</code> 파일에 즉시 영구 저장됩니다.</p>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 55px;">상태</th>
+                <th style="width: 120px;">세이펜 코드</th>
+                <th style="width: 140px;">검색 키워드</th>
+                <th>유튜브 영상 원제목</th>
+                <th style="width: 140px;">생성 파일</th>
+                <th style="width: 150px;">일시 / 비고</th>
+                <th style="width: 110px; text-align: center;">관리</th>
+              </tr>
+            </thead>
+            <tbody id="history-table-body">
+              <tr>
+                <td colspan="7" class="text-center py-4">기록을 불러오는 중입니다...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

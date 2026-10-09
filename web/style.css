@@ -1,0 +1,1335 @@
+/* =========================================================
+   세이펜 송북 메이커 & 유튜브 다운로더 스타일시트
+   ========================================================= */
+
+:root {
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
+  --primary-light: #eff6ff;
+  --success: #10b981;
+  --success-hover: #059669;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-500: #6b7280;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: #f1f5f9;
+  color: var(--gray-800);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* =========================================================
+   상단 헤더 & 네비게이션
+   ========================================================= */
+.app-header {
+  background: #ffffff;
+  border-bottom: 1px solid var(--gray-200);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logo-icon {
+  font-size: 2rem;
+  background: var(--primary-light);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-md);
+}
+
+.logo-text h1 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--gray-900);
+}
+
+.logo-text p {
+  font-size: 0.8rem;
+  color: var(--gray-500);
+}
+
+.nav-tabs {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tab-btn {
+  padding: 0.55rem 1.1rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: var(--gray-100);
+  color: var(--gray-700);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.tab-btn:hover {
+  background: var(--gray-200);
+}
+
+.tab-btn.active {
+  background: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+/* =========================================================
+   메인 컨테이너 및 공통 카드
+   ========================================================= */
+.main-container {
+  max-width: 1200px;
+  margin: 1.5rem auto;
+  padding: 0 1rem;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--gray-200);
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--gray-100);
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.panel-header h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+.section-sub {
+  font-size: 0.875rem;
+  color: var(--gray-500);
+  margin-top: 0.25rem;
+}
+
+/* =========================================================
+   버튼 및 폼 컴포넌트
+   ========================================================= */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.925rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+input[type="text"], input[type="number"], select {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-md);
+  background-color: #ffffff;
+  color: var(--gray-800);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input[type="text"]:focus, input[type="number"]:focus, select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.tab-btn {
+  padding: 0.55rem 1.1rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: var(--gray-100);
+  color: var(--gray-700);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .nav-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    width: 100%;
+    padding-bottom: 0.35rem;
+    -webkit-overflow-scrolling: touch;
+  }
+  .btn-group {
+    flex-wrap: wrap;
+  }
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #ffffff;
+}
+.btn-primary:hover {
+  background: var(--primary-hover);
+}
+
+.btn-success {
+  background: var(--success);
+  color: #ffffff;
+}
+.btn-success:hover {
+  background: var(--success-hover);
+}
+
+.btn-secondary {
+  background: var(--gray-700);
+  color: #ffffff;
+}
+.btn-secondary:hover {
+  background: var(--gray-800);
+}
+
+.btn-outline {
+  background: #ffffff;
+  border-color: var(--gray-300);
+  color: var(--gray-700);
+}
+.btn-outline:hover {
+  background: var(--gray-50);
+  border-color: var(--gray-400);
+}
+
+.btn-text {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-text:hover {
+  text-decoration: underline;
+}
+
+.btn-lg {
+  padding: 0.8rem 1.6rem;
+  font-size: 1.05rem;
+}
+
+.btn-group {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.badge-info {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+.badge-success {
+  background: #ecfdf5;
+  color: var(--success);
+}
+.badge-danger {
+  background: #fef2f2;
+  color: var(--danger);
+}
+.badge-warning {
+  background: #fffbeb;
+  color: var(--warning);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+}
+
+.col-span-2 {
+  grid-column: span 2;
+}
+@media (max-width: 768px) {
+  .col-span-2 {
+    grid-column: span 1;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+label {
+  font-size: 0.9rem;
+  color: var(--gray-700);
+}
+
+.label-with-count {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* 라인 번호가 있는 에디터 래퍼 */
+.editor-wrap {
+  display: flex;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-md);
+  background: #ffffff;
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.editor-wrap:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.line-numbers {
+  width: 44px;
+  background: #f8fafc;
+  border-right: 1px solid var(--gray-200);
+  color: #94a3b8;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  padding: 0.65rem 0.4rem;
+  text-align: right;
+  user-select: none;
+  overflow: hidden;
+  white-space: pre-wrap;
+}
+
+.editor-wrap textarea {
+  flex: 1;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.editor-wrap textarea:focus {
+  border: none;
+  box-shadow: none;
+}
+
+/* =========================================================
+   송북 글꼴 5종 클래스
+   ========================================================= */
+.font-nanum-round, .font-nanum-round * {
+  font-family: 'Nanum Round Gothic', sans-serif !important;
+}
+
+.font-pretendard, .font-pretendard * {
+  font-family: 'Pretendard', sans-serif !important;
+}
+
+.font-jua, .font-jua * {
+  font-family: 'Jua', sans-serif !important;
+}
+
+.font-gaegu, .font-gaegu * {
+  font-family: 'Gaegu', cursive, sans-serif !important;
+}
+
+.font-myeongjo, .font-myeongjo * {
+  font-family: 'Nanum Myeongjo', serif !important;
+}
+
+/* =========================================================
+   후보 영상 선택 카드 그리드
+   ========================================================= */
+.candidates-container {
+  margin-top: 1.5rem;
+}
+
+.section-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.candidate-keyword-group {
+  background: #ffffff;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.keyword-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.keyword-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.keyword-badge {
+  background: #e0e7ff;
+  color: #4338ca;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+}
+
+.saypen-code-badge {
+  background: #fef3c7;
+  color: #b45309;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  border: 1px solid #fde68a;
+}
+
+.candidate-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.candidate-card {
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.candidate-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.candidate-card.selected {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.candidate-thumb-wrap {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 비율 유지 */
+  background: #000000;
+}
+
+.candidate-thumb-wrap img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumb-duration {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.recommend-tag {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 0.725rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  box-shadow: var(--shadow-sm);
+}
+
+.candidate-info {
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+}
+
+.candidate-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.35;
+}
+
+.candidate-meta {
+  font-size: 0.775rem;
+  color: var(--gray-500);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+}
+
+.candidate-select-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+  color: var(--gray-500);
+}
+
+.candidate-card.selected .candidate-select-indicator {
+  color: var(--primary);
+}
+
+/* =========================================================
+   진행 상태 & 모달 & 스피너
+   ========================================================= */
+.loading-box {
+  background: #ffffff;
+  padding: 3rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--gray-200);
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.spinner {
+  width: 44px;
+  height: 44px;
+  border: 4px solid var(--gray-200);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 1rem auto;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.progress-box {
+  background: #ffffff;
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--primary);
+  margin-top: 1.5rem;
+  box-shadow: var(--shadow-md);
+}
+
+.progress-bar-wrap {
+  width: 100%;
+  height: 16px;
+  background: var(--gray-200);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin: 1rem 0 0.5rem 0;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--success));
+  transition: width 0.3s ease;
+}
+
+.progress-status-text {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: var(--gray-700);
+  font-weight: 600;
+}
+
+.complete-box {
+  background: #ecfdf5;
+  border: 2px solid var(--success);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.complete-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.check-icon {
+  font-size: 2.5rem;
+}
+
+/* =========================================================
+   데이터 테이블 (기록 탭)
+   ========================================================= */
+.table-responsive {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.data-table th, .data-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--gray-200);
+  text-align: left;
+}
+
+.data-table th {
+  background: var(--gray-50);
+  font-weight: 700;
+  color: var(--gray-700);
+}
+
+.data-table tr:hover {
+  background: var(--gray-50);
+}
+
+.data-table tr.row-failed {
+  background: #fff1f2;
+}
+
+/* =========================================================
+   A5 바인더 송북 컨트롤 패널
+   ========================================================= */
+.songbook-controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  align-items: end;
+  margin-bottom: 1rem;
+}
+
+.control-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.control-item-checkbox {
+  display: flex;
+  align-items: center;
+  padding-bottom: 0.5rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.range-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.tip-box {
+  background: #f8fafc;
+  border-left: 4px solid var(--primary);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  color: var(--gray-700);
+}
+
+/* =========================================================
+   A5 바인더 프리뷰 및 출력 규격 (사진 완벽 재현!)
+   ========================================================= */
+.print-preview-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  padding: 1rem 0;
+}
+
+/* A5 페이지 규격 (화면상에서는 실제 A5 비율 148:210 로 렌더링) */
+.a5-page {
+  width: 148mm;
+  min-height: 210mm;
+  height: 210mm;
+  background: #ffffff;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+  border: 1px solid var(--gray-300);
+  border-radius: 4px;
+  padding: 10mm 10mm 10mm 10mm;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  page-break-after: always;
+  break-after: page;
+}
+
+/* A5 헤더 영역 */
+.a5-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 4mm;
+  border-bottom: 2px solid #e2e8f0;
+  margin-bottom: 4mm;
+}
+
+.a5-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 뽀로로 스타일 원형 캐릭터 뱃지 */
+.a5-character-badge {
+  width: 15mm;
+  height: 15mm;
+  background: #fef08a;
+  border: 2px solid #38bdf8;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  flex-shrink: 0;
+}
+
+.a5-title-text {
+  font-family: 'Nanum Round Gothic', 'Pretendard', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: #1e293b;
+  letter-spacing: -0.5px;
+}
+
+/* 우측 전체 재생 아이콘 */
+.a5-header-play-btn {
+  width: 12mm;
+  height: 12mm;
+  background: #ef4444;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 15px;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.4);
+  flex-shrink: 0;
+}
+
+/* 8개 바둑판식 카드 그리드 (2열 x 4행) - 148.5mm 너비에 맞게 */
+.a5-grid-8 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(4, 1fr);
+  gap: 4mm 5mm;
+  flex: 1;
+  height: calc(100% - 20mm);
+}
+
+/* 6개 그리드 (2열 x 3행) */
+.a5-grid-6 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(3, 1fr);
+  gap: 5mm 6mm;
+  flex: 1;
+  height: calc(100% - 20mm);
+}
+
+/* 4개 그리드 (2열 x 2행) */
+.a5-grid-4 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(2, 1fr);
+  gap: 7mm 7mm;
+  flex: 1;
+  height: calc(100% - 20mm);
+}
+
+/* 개별 사운드 카드 */
+.a5-card {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  background: #ffffff;
+  border-radius: 4px;
+}
+
+/* 썸네일 래퍼: 제목 영역 제외하고 카드 높이 전체를 채움 */
+.a5-card-thumb-wrap {
+  position: relative;
+  width: 100%;
+  flex: 1;          /* 남은 공간 전부 차지 */
+  min-height: 0;    /* flex 자식에서 overflow 방지 */
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.a5-card-thumb-wrap img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;  /* 비율 유지하며 꽉 채움 */
+  border-radius: 4px;
+}
+
+/* 썸네일 우측 하단 원형 세이펜 스티커 부착 가이드라인 (REC1_010315 등)
+   화면: 카드 크기에 맞게 적절한 크기로 표시
+   인쇄: @media print 에서 실제 스티커 크기 9mm 로 강제 적용 */
+.circular-saypen-tag {
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1.5px dashed #f59e0b;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3px;
+  box-sizing: border-box;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.circular-saypen-tag span {
+  font-size: 7px;
+  font-weight: 800;
+  color: #b45309;
+  line-height: 1.05;
+  word-break: break-all;
+  overflow: hidden;
+  max-height: 40px;
+}
+
+/* 카드 하단 키워드/제목 텍스트 */
+.a5-card-title {
+  margin-top: 2.5mm;
+  font-size: 14px;
+  font-weight: 800;
+  color: #334155;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 2px;
+  outline: none;
+  cursor: text;
+}
+
+.a5-card-title:focus {
+  background: #fef08a;
+  border-radius: 2px;
+}
+
+/* 화면에서 순서 조절을 위한 호버 툴바 */
+.card-hover-tools {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 20;
+}
+
+.a5-card:hover .card-hover-tools {
+  opacity: 1;
+}
+
+.card-tool-btn {
+  background: rgba(0,0,0,0.7);
+  color: #ffffff;
+  border: none;
+  border-radius: 3px;
+  font-size: 10px;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-tool-btn:hover {
+  background: var(--primary);
+}
+
+.hidden {
+  display: none !important;
+}
+
+.mt-4 {
+  margin-top: 1rem;
+}
+
+.py-4 {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* =========================================================
+   A4 용지 레이아웃 - A4 가로 2페이지 (각 절반이 꽉 차게)
+   ('자르는선' 문구 제외, 중앙 절취선만 표시)
+   ========================================================= */
+
+/* [모드 1] A4 가로 2페이지 시트 (297mm x 210mm)
+   - 각 절반(148.5mm)을 내지로 꽉 채워 사용
+   - 중앙에 점선 절취선 표시
+*/
+.a4-sheet-landscape {
+  width: 297mm;
+  height: 210mm;
+  min-height: 210mm;
+  background: #ffffff;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+  border-radius: 4px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  position: relative;
+  overflow: hidden;
+  page-break-after: always;
+  break-after: page;
+}
+
+/* A4 가로 절반 내지: 148.5mm × 210mm (꽉 채움) */
+.binder-page-132x208 {
+  width: 148.5mm;
+  height: 210mm;
+  min-height: 210mm;
+  max-height: 210mm;
+  box-sizing: border-box;
+  padding: 7mm 8mm 8mm 8mm;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: #ffffff;
+}
+
+/* 중앙 절취 점선 (우측 내지 왼쪽 경계) */
+.binder-page-132x208:last-child {
+  border-left: 1.5px dashed #94a3b8;
+}
+
+/* [모드 2] A4 세로 1페이지 시트 (210mm x 297mm, 중앙에 132x208mm 배치) */
+.a4-sheet-portrait {
+  width: 210mm;
+  height: 297mm;
+  min-height: 297mm;
+  background: #ffffff;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+  border-radius: 4px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  page-break-after: always;
+  break-after: page;
+}
+
+/* [모드 3] A4 세로 전면 페이지 (210mm x 297mm 꽉 채운 인쇄) */
+.a4-full-page-portrait {
+  width: 210mm;
+  height: 297mm;
+  min-height: 297mm;
+  max-height: 297mm;
+  box-sizing: border-box;
+  padding: 12mm 10mm 12mm 16mm;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: #ffffff;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+  border-radius: 4px;
+  page-break-after: always;
+  break-after: page;
+}
+
+/* A5 직접 인쇄 규격 (148mm x 210mm) */
+.a5-page {
+  width: 148mm;
+  height: 210mm;
+  min-height: 210mm;
+  max-height: 210mm;
+  box-sizing: border-box;
+  padding: 8mm 6mm 8mm 14mm;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: #ffffff;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+  border-radius: 4px;
+  page-break-after: always;
+  break-after: page;
+}
+
+/* 바인더 6공 타공(펀칭) 가이드 (6개 타공점) */
+.punch-guide-container {
+  position: absolute;
+  left: 4mm;
+  top: 0;
+  bottom: 0;
+  width: 5mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  pointer-events: none;
+  z-index: 40;
+}
+
+.punch-dot {
+  width: 3.5mm;
+  height: 3.5mm;
+  border: 1px dashed #cbd5e1;
+  border-radius: 50%;
+  background: rgba(241, 245, 249, 0.5);
+}
+
+/* =========================================================
+   인쇄 전용 스타일 (@media print)
+   ========================================================= */
+@media print {
+  body {
+    background: #ffffff !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .no-print,
+  .app-header,
+  .panel-card,
+  .card-hover-tools {
+    display: none !important;
+  }
+
+  .main-container {
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .tab-content {
+    display: block !important;
+  }
+
+  #tab-download, #tab-history {
+    display: none !important;
+  }
+
+  .print-preview-wrapper {
+    gap: 0 !important;
+    padding: 0 !important;
+  }
+
+  .a4-sheet-landscape {
+    width: 297mm !important;
+    height: 210mm !important;
+    min-height: 210mm !important;
+    max-height: 210mm !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .binder-page-132x208 {
+    width: 132mm !important;
+    height: 208mm !important;
+    min-height: 208mm !important;
+    max-height: 208mm !important;
+    box-shadow: none !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .a4-sheet-portrait {
+    width: 210mm !important;
+    height: 297mm !important;
+    min-height: 297mm !important;
+    max-height: 297mm !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .a4-full-page-portrait {
+    width: 210mm !important;
+    height: 297mm !important;
+    min-height: 297mm !important;
+    max-height: 297mm !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .a5-page {
+    width: 148mm !important;
+    height: 210mm !important;
+    min-height: 210mm !important;
+    max-height: 210mm !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .punch-dot, .circular-saypen-tag {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* 인쇄 시 원형 스티커 가이드 - 카드 모서리에 적절한 크기로 표시 */
+  .circular-saypen-tag {
+    width: 9mm !important;
+    height: 9mm !important;
+    bottom: 2mm !important;
+    right: 2mm !important;
+    padding: 2mm !important;
+  }
+
+  .circular-saypen-tag span {
+    font-size: 5.5pt !important;
+    max-height: none !important;
+  }
+}
+
+/* =========================================================
+   PWA & 광고 배너 전용 스타일
+   ========================================================= */
+.pwa-banner {
+  background: linear-gradient(135deg, #4a6fa5, #2d4059);
+  color: white;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+  font-size: 0.9rem;
+}
+
+.pwa-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ad-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0.75rem auto;
+  text-align: center;
+}
+
+.ad-placeholder {
+  background: var(--gray-100);
+  border: 1px dashed var(--gray-300);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 70px;
+}
+
+.ad-placeholder p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--gray-600);
+}
+
+.ad-bottom-sticky {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: #ffffff;
+  border-top: 1px solid var(--gray-200);
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
+  margin: 0;
+  padding: 0.35rem 0;
+}
+
+.ad-placeholder-sticky {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--gray-600);
+}
+
+.ad-label {
+  background: var(--gray-300);
+  color: var(--gray-800);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.15rem 0.35rem;
+  border-radius: 3px;
+}
+
+@media print {
+  .pwa-banner, .ad-container, .ad-bottom-sticky, .no-print {
+    display: none !important;
+  }
+}
+
