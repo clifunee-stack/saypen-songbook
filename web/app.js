@@ -423,9 +423,13 @@ function renderCandidateList() {
   const container = document.getElementById('candidates-list');
   container.innerHTML = '';
 
+  const filenameType = document.querySelector('input[name="filename-type"]:checked')?.value || 'saypen_code';
+
   state.searchedResults.forEach((group, groupIdx) => {
     const groupCard = document.createElement('div');
     groupCard.className = 'candidate-keyword-group';
+
+    const previewFilename = filenameType === 'keyword' ? `${group.keyword}.mp3` : `${group.saypen_code}.mp3`;
 
     const header = document.createElement('div');
     header.className = 'keyword-header';
@@ -434,7 +438,9 @@ function renderCandidateList() {
         <span class="keyword-badge">#${groupIdx + 1}</span>
         <strong>${escapeHtml(group.keyword)}</strong>
       </div>
-      <span class="saypen-code-badge">세이펜 코드: <strong>${escapeHtml(group.saypen_code)}</strong></span>
+      <span class="saypen-code-badge" data-code="${group.saypen_code}" data-keyword="${group.keyword}">
+        📁 저장 파일명: <strong>${escapeHtml(previewFilename)}</strong>
+      </span>
     `;
     groupCard.appendChild(header);
 
@@ -494,6 +500,26 @@ function renderCandidateList() {
 
     groupCard.appendChild(grid);
     container.appendChild(groupCard);
+  });
+
+  // 파일명 형식 라디오 버튼 실시간 동기화 및 후보 카드 뱃지 업데이트
+  document.querySelectorAll('input[name="filename-type"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      const selectedVal = radio.value;
+      // 화면의 모든 filename-type 라디오 버튼 체크 상태 동기화
+      document.querySelectorAll('input[name="filename-type"]').forEach(r => {
+        r.checked = (r.value === selectedVal);
+      });
+      // 모든 후보 카드의 파일명 뱃지 실시간 갱신
+      document.querySelectorAll('.saypen-code-badge').forEach(badge => {
+        const code = badge.getAttribute('data-code');
+        const kw = badge.getAttribute('data-keyword');
+        if (code && kw) {
+          const fn = selectedVal === 'keyword' ? `${kw}.mp3` : `${code}.mp3`;
+          badge.innerHTML = `📁 저장 파일명: <strong>${escapeHtml(fn)}</strong>`;
+        }
+      });
+    });
   });
 }
 

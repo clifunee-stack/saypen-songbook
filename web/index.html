@@ -147,10 +147,21 @@
 
       <!-- 후보 선택 영역 -->
       <div id="candidates-container" class="candidates-container hidden">
-        <div class="section-title-row">
+        <div class="section-title-row" style="background: var(--bg-card); padding: 1rem 1.25rem; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 1rem; align-items: center; flex-wrap: wrap; gap: 1rem;">
           <div>
-            <h3>🎬 검색된 영상 후보 확인 및 선택</h3>
-            <p class="section-sub">각 키워드별로 마음에 드는 영상을 선택하세요. (기본으로 적정 길이의 최적 영상이 선택되어 있습니다.)</p>
+            <h3 style="margin: 0 0 0.35rem 0;">🎬 검색된 영상 후보 확인 및 선택</h3>
+            <!-- 파일명 저장 형식 빠른 선택 (후보 선택 후에도 즉시 변경 가능) -->
+            <div style="display: flex; gap: 1.25rem; flex-wrap: wrap; align-items: center; font-size: 0.92rem; margin-top: 0.25rem;">
+              <span style="font-weight: 700; color: var(--primary);">💾 저장 파일명:</span>
+              <label style="display: inline-flex; align-items: center; gap: 0.35rem; cursor: pointer;">
+                <input type="radio" name="filename-type" value="saypen_code" checked>
+                <span>🏷️ <strong>스티커 번호</strong> (예: <code>REC1_1000.mp3</code>)</span>
+              </label>
+              <label style="display: inline-flex; align-items: center; gap: 0.35rem; cursor: pointer;">
+                <input type="radio" name="filename-type" value="keyword">
+                <span>🎵 <strong>곡 제목</strong> (예: <code>노래제목.mp3</code>)</span>
+              </label>
+            </div>
           </div>
           <button id="btn-start-download" class="btn btn-success btn-lg">
             <span>🚀</span> 선택한 영상 일괄 다운로드 시작
@@ -185,16 +196,19 @@
         <div class="complete-header">
           <span class="check-icon">🎉</span>
           <div>
-            <h3>다운로드가 완료되었습니다!</h3>
-            <p id="download-summary-text">총 8곡 중 8곡 성공</p>
+            <h3>음원 변환이 완료되었습니다!</h3>
+            <p id="download-summary-text" style="font-weight: 700; margin: 0.2rem 0;">총 8곡 중 8곡 성공</p>
+            <p style="font-size: 0.88rem; color: #166534; margin: 0.25rem 0 0 0;">
+              💡 <strong>[내 컴퓨터에 MP3 & 이미지 저장]</strong> 버튼을 누르시면 PC 또는 스마트폰의 다운로드 폴더로 파일이 저장됩니다!
+            </p>
           </div>
         </div>
-        <div class="btn-group">
+        <div class="btn-group" style="margin-top: 1rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+          <button id="btn-browser-download-all" class="btn btn-success btn-lg" style="font-weight: 700; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35);">
+            <span>📥</span> 내 컴퓨터에 MP3 & 이미지 저장하기
+          </button>
           <button id="btn-go-songbook" class="btn btn-primary btn-lg">
             <span>📖</span> 바로 A5 바인더 송북 만들기
-          </button>
-          <button id="btn-browser-download-all" class="btn btn-secondary btn-lg">
-            <span>📦</span> 음원 & 이미지 브라우저 저장
           </button>
           <button id="btn-open-folder" class="btn btn-outline">
             <span>📁</span> PC 폴더 열기
