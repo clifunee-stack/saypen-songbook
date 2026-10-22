@@ -88,6 +88,22 @@
             <input type="text" id="saypen-start-num" value="1000" placeholder="예: 1000">
             <p class="help-text">구매하신 오디오렉 스티커의 시작 번호 (1씩 자동 증가)</p>
           </div>
+
+          <!-- 음원 및 이미지 저장 파일명 선택 옵션 -->
+          <div class="form-group col-span-2">
+            <label><strong>💾 음원 및 이미지 파일명 저장 형식</strong></label>
+            <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; margin-top: 0.35rem;">
+              <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.95rem;">
+                <input type="radio" name="filename-type" value="saypen_code" checked>
+                <span>🏷️ <strong>스티커 번호</strong> (예: <code>REC1_1000.mp3</code> / 세이펜 기기 저장용)</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.95rem;">
+                <input type="radio" name="filename-type" value="keyword">
+                <span>🎵 <strong>검색 키워드 단어</strong> (예: <code>개굴개굴개구리.mp3</code> / PC·스마트폰 보관용)</span>
+              </label>
+            </div>
+            <p class="help-text">원하시는 파일명 규칙을 선택하시면 MP3 음원 및 썸네일 이미지가 해당 이름으로 저장됩니다.</p>
+          </div>
         </div>
 
         <div class="action-row">
@@ -97,10 +113,22 @@
         </div>
       </div>
 
-      <!-- 로딩 인디케이터 -->
-      <div id="search-loading" class="loading-box hidden">
-        <div class="spinner"></div>
-        <p id="search-loading-text">유튜브에서 최적의 영상 후보를 검색 중입니다... 잠시만 기다려주세요.</p>
+      <!-- 실시간 검색 진행률 인디케이터 (몇 번째 작업 중, 몇 개 남음) -->
+      <div id="search-loading" class="loading-box hidden" style="text-align: left; max-width: 650px; margin: 1.5rem auto; padding: 1.5rem; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem;">
+          <h4 id="search-progress-step" style="margin: 0; font-size: 1.05rem; color: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
+            <span class="spinner" style="width: 18px; height: 18px; border-width: 2px; margin: 0; display: inline-block;"></span>
+            <span id="search-progress-step-text">총 0개 중 0번째 검색 작업 중...</span>
+          </h4>
+          <span id="search-progress-percent" style="font-weight: 700; color: var(--primary); font-size: 1.05rem;">0%</span>
+        </div>
+        <div class="progress-bar-wrap" style="height: 12px; background: var(--border); border-radius: 6px; overflow: hidden; margin-bottom: 0.6rem;">
+          <div id="search-progress-bar-fill" class="progress-bar-fill" style="width: 0%; height: 100%; background: linear-gradient(90deg, #4f46e5, #06b6d4); transition: width 0.25s ease;"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.88rem; color: var(--text-muted);">
+          <span id="search-progress-current">🔎 유튜브에서 영상 후보를 탐색하고 있습니다...</span>
+          <span id="search-progress-remaining" style="font-weight: 600; color: var(--primary);">0개 남음</span>
+        </div>
       </div>
 
       <!-- 후보 선택 영역 -->
@@ -170,6 +198,9 @@
         <div class="panel-header">
           <h2>🎨 A5 바인더 사운드 카드 설정 및 편집</h2>
           <div class="btn-group">
+            <button id="btn-sync-from-search" class="btn btn-outline" title="1번 탭에서 검색한 키워드와 썸네일 이미지로 송북 카드를 즉시 채웁니다.">
+              <span>🔄</span> 검색한 곡으로 송북 채우기
+            </button>
             <button id="btn-print-songbook" class="btn btn-primary">
               <span>🖨️</span> A5 규격 인쇄 / PDF 저장
             </button>

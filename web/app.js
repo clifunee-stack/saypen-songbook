@@ -56,6 +56,10 @@ function switchTab(tabId) {
   });
 
   if (tabId === 'tab-songbook') {
+    // 바인더 송북 탭으로 넘어갈 때, 검색된 결과가 있으면 검색 키워드와 이미지를 순차 자동 반영
+    if (state.searchedResults && state.searchedResults.length > 0) {
+      syncSongbookFromSearchedResults(false);
+    }
     renderSongbookPages();
   } else if (tabId === 'tab-history') {
     loadHistory();
@@ -166,35 +170,58 @@ function initDownloadHandlers() {
     const keysToFetch = searchKeys.filter(sk => !cachedKeywordMap[sk] || !cachedKeywordMap[sk].candidates || cachedKeywordMap[sk].candidates.length === 0);
 
     if (keysToFetch.length > 0) {
-      document.getElementById('search-loading').classList.remove('hidden');
+      const searchLoadingBox = document.getElementById('search-loading');
+      const searchStepText = document.getElementById('search-progress-step-text');
+      const searchPercent = document.getElementById('search-progress-percent');
+      const searchBarFill = document.getElementById('search-progress-bar-fill');
+      const searchCurrent = document.getElementById('search-progress-current');
+      const searchRemaining = document.getElementById('search-progress-remaining');
+
+      searchLoadingBox.classList.remove('hidden');
       document.getElementById('candidates-container').classList.add('hidden');
       document.getElementById('download-complete-box').classList.add('hidden');
       btnSearch.disabled = true;
 
+      const totalFetch = keysToFetch.length;
       try {
-        const response = await fetch('/api/search', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ keywords: keysToFetch, limit: 3 })
-        });
+        for (let i = 0; i < totalFetch; i++) {
+          const sk = keysToFetch[i];
+          const currentStep = i + 1;
+          const leftCount = totalFetch - currentStep;
+          const percentVal = Math.round((i / totalFetch) * 100);
 
-        const data = await response.json();
-        if (data.status !== 'ok') {
-          throw new Error(data.message || '검색에 실패했습니다.');
+          if (searchStepText) searchStepText.textContent = `총 ${totalFetch}개 중 ${currentStep}번째 검색 작업 중...`;
+          if (searchPercent) searchPercent.textContent = `${percentVal}%`;
+          if (searchBarFill) searchBarFill.style.width = `${percentVal}%`;
+          if (searchCurrent) searchCurrent.textContent = `🔎 "${sk}" 유튜브 후보 탐색 중...`;
+          if (searchRemaining) searchRemaining.textContent = `${leftCount}개 남음`;
+
+          const response = await fetch('/api/search', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ keywords: [sk], limit: 3 })
+          });
+
+          const data = await response.json();
+          if (data.status === 'ok' && data.results) {
+            data.results.forEach(res => {
+              const candidates = res.candidates || [];
+              let defaultIdx = candidates.findIndex(c => c.is_recommended);
+              if (defaultIdx === -1) defaultIdx = 0;
+              cachedKeywordMap[res.keyword] = { candidates, selectedIndex: defaultIdx };
+            });
+          }
         }
 
-        (data.results || []).forEach(res => {
-          const candidates = res.candidates || [];
-          let defaultIdx = candidates.findIndex(c => c.is_recommended);
-          if (defaultIdx === -1) defaultIdx = 0;
-          cachedKeywordMap[res.keyword] = { candidates, selectedIndex: defaultIdx };
-        });
-
+        if (searchBarFill) searchBarFill.style.width = '100%';
+        if (searchPercent) searchPercent.textContent = '100%';
+        if (searchStepText) searchStepText.textContent = '모든 검색이 완료되었습니다!';
+        if (searchRemaining) searchRemaining.textContent = '0개 남음';
       } catch (err) {
         alert('검색 중 오류가 발생했습니다: ' + err.message);
         return;
       } finally {
-        document.getElementById('search-loading').classList.add('hidden');
+        searchLoadingBox.classList.add('hidden');
         btnSearch.disabled = false;
       }
     }
@@ -218,6 +245,9 @@ function initDownloadHandlers() {
 
     renderCandidateList();
     document.getElementById('candidates-container').classList.remove('hidden');
+
+    // 검색 완료 즉시 바인더 송북 제작 탭에도 검색 키워드 & 이미지 자동 순차 동기화
+    syncSongbookFromSearchedResults(false);
   });
 
   // 일괄 다운로드 시작
@@ -226,6 +256,9 @@ function initDownloadHandlers() {
       alert('선택할 영상 후보가 없습니다.');
       return;
     }
+
+    // 파일명 저장 방식 (스티커 번호 or 검색 키워드 단어)
+    const filenameType = document.querySelector('input[name="filename-type"]:checked')?.value || 'saypen_code';
 
     // 다운로드할 대상 추출
     const itemsToDownload = [];
@@ -240,7 +273,8 @@ function initDownloadHandlers() {
         video_id: selectedCand.id,
         title: selectedCand.title,
         url: selectedCand.url,
-        thumbnail: selectedCand.thumbnail
+        thumbnail: selectedCand.thumbnail,
+        filename_type: filenameType
       });
     }
 
@@ -289,13 +323,15 @@ function initDownloadHandlers() {
       
       document.getElementById('download-complete-box').classList.remove('hidden');
 
-      // 성공한 곡들을 A5 송북 리스트에 추가
+      // 성공한 곡들을 A5 송북 리스트에 추가 (검색 키워드 우선 사용 및 실제 저장된 썸네일 경로 매핑)
       const newSongbookCards = results.filter(r => r.success).map(r => ({
         id: r.saypen_code,
-        title: r.keyword || r.youtube_title, // 사용자가 입력한 키워드를 카드 제목으로 우선 사용
+        title: r.keyword || r.youtube_title, // 사용자가 입력한 검색 키워드를 카드 타이틀로 지정
         youtube_title: r.youtube_title,
         saypen_code: r.saypen_code,
-        thumb_url: `/downloads/${r.jpg_file}`
+        thumb_url: `/downloads/${encodeURIComponent(r.jpg_file)}`,
+        mp3_file: r.mp3_file,
+        jpg_file: r.jpg_file
       }));
 
       if (newSongbookCards.length > 0) {
@@ -395,6 +431,8 @@ function renderCandidateList() {
           const txt = c.querySelector('.candidate-select-indicator span');
           if (txt) txt.textContent = (idx === candIdx) ? '선택됨' : '선택하기';
         });
+        // 후보 영상 선택 변경 시 바인더 송북에도 실시간 썸네일 동기화
+        syncSongbookFromSearchedResults(false);
       });
 
       grid.appendChild(card);
@@ -403,6 +441,41 @@ function renderCandidateList() {
     groupCard.appendChild(grid);
     container.appendChild(groupCard);
   });
+}
+
+// 1번 탭에서 검색한 키워드 목록 및 영상 썸네일을 바인더 송북 카드 목록으로 순차 동기화
+function syncSongbookFromSearchedResults(showToast = false) {
+  if (!state.searchedResults || state.searchedResults.length === 0) {
+    if (showToast) alert('먼저 1번 탭에서 노래 키워드를 검색해주세요.');
+    return;
+  }
+
+  // 검색된 결과에서 키워드 글자와 선택된 후보 영상의 썸네일/세이펜 코드를 순서대로 추출
+  const syncedItems = [];
+  state.searchedResults.forEach(item => {
+    let thumb = 'https://placehold.co/320x180/e2e8f0/475569?text=' + encodeURIComponent(item.keyword);
+    if (item.candidates && item.candidates.length > 0) {
+      const selected = item.candidates[item.selectedIndex] || item.candidates[0];
+      if (selected && selected.thumbnail) {
+        thumb = selected.thumbnail;
+      }
+    }
+
+    syncedItems.push({
+      id: item.saypen_code,
+      title: item.keyword, // 사용자가 입력한 검색 키워드 글자를 카드 제목으로 그대로 매핑
+      saypen_code: item.saypen_code,
+      thumb_url: thumb
+    });
+  });
+
+  if (syncedItems.length > 0) {
+    state.songbookItems = syncedItems;
+    renderSongbookPages();
+    if (showToast) {
+      alert(`검색 키워드 목록의 ${syncedItems.length}개 곡이 이미지와 함께 바인더 송북에 순서대로 반영되었습니다!`);
+    }
+  }
 }
 
 /* =========================================================
@@ -499,6 +572,14 @@ function initSongbookHandlers() {
 
   // 독립형 HTML 저장
   btnExportHtml.addEventListener('click', exportStandaloneSongbookHtml);
+
+  // 검색 키워드 및 이미지로 송북 채우기 버튼
+  const btnSyncFromSearch = document.getElementById('btn-sync-from-search');
+  if (btnSyncFromSearch) {
+    btnSyncFromSearch.addEventListener('click', () => {
+      syncSongbookFromSearchedResults(true);
+    });
+  }
 
   // 초기 인쇄 스타일 세팅
   updateDynamicPrintStyle();
@@ -1147,23 +1228,27 @@ function triggerBatchBrowserDownload(items) {
   let delay = 0;
   let count = 0;
   items.forEach(item => {
-    if (item.saypen_code) {
-      const mp3Filename = `${item.saypen_code}.mp3`;
+    // 1. MP3 음원 다운로드
+    const mp3Filename = item.mp3_file || (item.saypen_code ? `${item.saypen_code}.mp3` : null);
+    if (mp3Filename) {
       setTimeout(() => {
-        downloadSingleFile(`/downloads/${mp3Filename}?download=1`, mp3Filename);
+        downloadSingleFile(`/downloads/${encodeURIComponent(mp3Filename)}?download=1`, mp3Filename);
       }, delay);
       delay += 350;
       count++;
     }
-    if (item.saypen_code && item.thumb_url && item.thumb_url.includes('/downloads/')) {
-      const imgFilename = item.thumb_url.split('/downloads/')[1];
-      if (imgFilename) {
-        setTimeout(() => {
-          downloadSingleFile(`/downloads/${imgFilename}?download=1`, imgFilename);
-        }, delay);
-        delay += 350;
-        count++;
-      }
+
+    // 2. 썸네일 이미지 다운로드
+    let imgFilename = item.jpg_file;
+    if (!imgFilename && item.thumb_url && item.thumb_url.includes('/downloads/')) {
+      imgFilename = decodeURIComponent(item.thumb_url.split('/downloads/')[1]);
+    }
+    if (imgFilename) {
+      setTimeout(() => {
+        downloadSingleFile(`/downloads/${encodeURIComponent(imgFilename)}?download=1`, imgFilename);
+      }, delay);
+      delay += 350;
+      count++;
     }
   });
   alert(`${items.length}개 곡의 MP3 음원 및 썸네일 이미지(${count}개 파일) 브라우저 저장 다운로드를 시작합니다.`);

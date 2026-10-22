@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+downloads/*.mp3
+downloads/*.webm
+downloads/*.part

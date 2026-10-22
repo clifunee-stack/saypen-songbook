@@ -393,9 +393,18 @@ def download_item(item, output_dir=DOWNLOADS_DIR):
     keyword = item.get("keyword", "")
     title = item.get("title", "")
 
-    # 저장될 파일 이름 및 경로 (예: REC1_1000.mp3, REC1_1000.jpg)
-    mp3_filename = f"{safe_code}.mp3"
-    jpg_filename = f"{safe_code}.jpg"
+    # 파일명 저장 방식 결정 (saypen_code: 스티커 번호 / keyword: 검색 키워드 단어)
+    filename_type = item.get("filename_type", "saypen_code")
+    if filename_type == "keyword" and keyword:
+        # 윈도우/리눅스 파일명에 사용 불가능한 특수문자 제거 (\ / : * ? " < > |)
+        safe_keyword = "".join(c for c in keyword if c not in '\\/:*?"<>|').strip()
+        base_name = safe_keyword if safe_keyword else safe_code
+    else:
+        base_name = safe_code
+
+    # 저장될 파일 이름 및 경로 (예: REC1_1000.mp3 또는 개굴개굴개구리.mp3)
+    mp3_filename = f"{base_name}.mp3"
+    jpg_filename = f"{base_name}.jpg"
     mp3_filepath = os.path.join(output_dir, mp3_filename)
     jpg_filepath = os.path.join(output_dir, jpg_filename)
 
@@ -424,7 +433,7 @@ def download_item(item, output_dir=DOWNLOADS_DIR):
 
     # ── 2단계: MP3 음원 다운로드 및 변환 ──────────────────────
     # yt-dlp로 유튜브 영상에서 음원만 추출 후 ffmpeg로 MP3 변환
-    output_template = os.path.join(output_dir, f"{safe_code}.%(ext)s")
+    output_template = os.path.join(output_dir, f"{base_name}.%(ext)s")
 
     ffmpeg_path = get_ffmpeg_cmd()
     cmd = [
