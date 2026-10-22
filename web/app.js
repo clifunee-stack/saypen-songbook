@@ -8,7 +8,7 @@ const state = {
   searchedResults: [], // [{ keyword, saypen_code, candidates: [...], selectedIndex: 0 }]
   songbookItems: [],   // 송북에 들어갈 카드 목록 [{ id, title, saypen_code, thumb_url }]
   songbookSettings: {
-    title: '뽀로로 사운드 카드',
+    title: '뽀로로 동요',
     icon: '🐧',
     font: 'font-nanum-round',
     cardsPerPage: 8,
@@ -128,7 +128,7 @@ function initDownloadHandlers() {
     const charInput = document.getElementById('character-name');
     if (charInput && !charInput.value.trim()) {
       charInput.value = '뽀로로';
-      const defaultTitle = '뽀로로 사운드 카드';
+      const defaultTitle = '뽀로로';
       state.songbookSettings.title = defaultTitle;
       const bookTitleInput = document.getElementById('book-title');
       if (bookTitleInput) bookTitleInput.value = defaultTitle;
@@ -136,17 +136,16 @@ function initDownloadHandlers() {
     updateLineNumbers();
   });
 
-  // 캐릭터/시리즈 이름 입력 시 송북 타이틀 초기값으로 자동 연동
+  // 캐릭터/시리즈 이름 입력 시 송북 타이틀 초기값으로 자동 연동 (사운드 카드 문구 없이 입력값 그대로)
   const charInput = document.getElementById('character-name');
   if (charInput) {
     charInput.addEventListener('input', () => {
       const val = charInput.value.trim();
       if (val) {
-        const generatedTitle = `${val} 사운드 카드`;
-        state.songbookSettings.title = generatedTitle;
+        state.songbookSettings.title = val;
         const bookTitleInput = document.getElementById('book-title');
         if (bookTitleInput) {
-          bookTitleInput.value = generatedTitle;
+          bookTitleInput.value = val;
         }
       }
     });
@@ -733,15 +732,15 @@ function createA5Content(pageItems, pageIdx, isRightPage = false) {
 
       <div class="a5-card-thumb-wrap">
         <img src="${song.thumb_url}" alt="${escapeHtml(song.title)}" onerror="this.src='https://placehold.co/320x180/e2e8f0/475569?text=${encodeURIComponent(song.title)}'">
-        ${state.songbookSettings.showSaypenCode ? `
-          <div class="circular-saypen-tag" title="스티커 부착 위치">
-            <span>${escapeHtml(song.saypen_code || '')}</span>
-          </div>
-        ` : ''}
       </div>
 
-      <div class="a5-card-title" contenteditable="true" spellcheck="false" title="클릭하여 제목 수정 가능">
-        ${escapeHtml(song.title)}
+      <div class="a5-card-bottom-row">
+        <div class="a5-card-title" contenteditable="true" spellcheck="false" title="클릭하여 제목 수정 가능">
+          ${escapeHtml(song.title)}
+        </div>
+        ${state.songbookSettings.showSaypenCode && song.saypen_code ? `
+          <div class="a5-saypen-code-text" title="세이펜 스티커 번호">${escapeHtml(song.saypen_code)}</div>
+        ` : ''}
       </div>
     `;
 
@@ -1439,7 +1438,7 @@ function applySeriesToSongbookAndEditor(series) {
 
   // 2. 송북 타이틀 기본값 반영 (사용자가 언제든 수정 가능)
   const bookTitleInput = document.getElementById('book-title');
-  const newTitle = `${series.name} 사운드 카드`;
+  const newTitle = series.name;
   state.songbookSettings.title = newTitle;
   if (bookTitleInput) bookTitleInput.value = newTitle;
 

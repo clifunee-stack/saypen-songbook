@@ -901,43 +901,30 @@ label {
   border-radius: 4px;
 }
 
-/* 썸네일 우측 하단 원형 세이펜 스티커 부착 가이드라인 (REC1_010315 등)
-   화면: 카드 크기에 맞게 적절한 크기로 표시
-   인쇄: @media print 에서 실제 스티커 크기 9mm 로 강제 적용 */
-.circular-saypen-tag {
-  position: absolute;
-  bottom: 3px;
-  right: 3px;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.94);
-  border: 1.5px dashed #f59e0b;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+/* 카드 하단 정보 행 (제목 좌측 정렬 + 스티커 번호 우측 정렬) */
+.a5-card-bottom-row {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 3px;
-  box-sizing: border-box;
-  z-index: 10;
-  pointer-events: none;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px;
+  margin-top: 2.2mm;
+  width: 100%;
 }
 
-.circular-saypen-tag span {
-  font-size: 7px;
+/* 썸네일 오른쪽 하단(바깥부분) 스티커 번호 텍스트 (원형 테두리 삭제, 기존 원형 안 글자 크기 유지) */
+.a5-saypen-code-text {
+  font-size: 7.5px;
   font-weight: 800;
-  color: #b45309;
-  line-height: 1.05;
-  word-break: break-all;
-  overflow: hidden;
-  max-height: 40px;
+  color: #64748b;
+  white-space: nowrap;
+  letter-spacing: -0.2px;
+  flex-shrink: 0;
 }
 
 /* 카드 하단 키워드/제목 텍스트 */
 .a5-card-title {
-  margin-top: 2.5mm;
-  font-size: 14px;
+  margin-top: 0;
+  font-size: 13.5px;
   font-weight: 800;
   color: #334155;
   white-space: nowrap;
@@ -946,6 +933,7 @@ label {
   padding: 0 2px;
   outline: none;
   cursor: text;
+  flex: 1;
 }
 
 .a5-card-title:focus {
@@ -1231,23 +1219,17 @@ label {
     print-color-adjust: exact !important;
   }
 
-  .punch-dot, .circular-saypen-tag {
+  .punch-dot {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  /* 인쇄 시 원형 스티커 가이드 - 카드 모서리에 적절한 크기로 표시 */
-  .circular-saypen-tag {
-    width: 9mm !important;
-    height: 9mm !important;
-    bottom: 2mm !important;
-    right: 2mm !important;
-    padding: 2mm !important;
-  }
-
-  .circular-saypen-tag span {
+  /* 인쇄 시 썸네일 오른쪽 하단 스티커 번호 텍스트 크기 */
+  .a5-saypen-code-text {
     font-size: 5.5pt !important;
-    max-height: none !important;
+    color: #475569 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }
 
