@@ -128,9 +128,32 @@ function initDownloadHandlers() {
     const charInput = document.getElementById('character-name');
     if (charInput && !charInput.value.trim()) {
       charInput.value = '뽀로로';
+      const defaultTitle = '뽀로로 사운드 카드';
+      state.songbookSettings.title = defaultTitle;
+      const bookTitleInput = document.getElementById('book-title');
+      if (bookTitleInput) bookTitleInput.value = defaultTitle;
     }
     updateLineNumbers();
   });
+
+  // 캐릭터/시리즈 이름 입력 시 송북 타이틀 초기값으로 자동 연동
+  const charInput = document.getElementById('character-name');
+  if (charInput) {
+    charInput.addEventListener('input', () => {
+      const val = charInput.value.trim();
+      if (val) {
+        const generatedTitle = `${val} 사운드 카드`;
+        state.songbookSettings.title = generatedTitle;
+        const bookTitleInput = document.getElementById('book-title');
+        if (bookTitleInput) {
+          bookTitleInput.value = generatedTitle;
+        }
+      }
+    });
+  }
+
+  // 시리즈 보관함 (저장/불러오기) 초기화
+  initSeriesStorageHandlers();
 
   // 상위 3개 영상 후보 검색 (스마트 부분 재검색 지원)
   btnSearch.addEventListener('click', async () => {
@@ -1262,4 +1285,206 @@ function downloadSingleFile(url, filename) {
   a.click();
   document.body.removeChild(a);
 }
+
+/* =========================================================
+   시리즈 보관함 (localStorage) 로직
+   ========================================================= */
+const SERIES_STORAGE_KEY = 'saypen_saved_series_list';
+
+function getSavedSeriesList() {
+  try {
+    const raw = localStorage.getItem(SERIES_STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return [
+    {
+      id: 'default_pororo',
+      name: '뽀로로 인기 동요',
+      character: '뽀로로',
+      keywords: [
+        "뽀롱뽀롱 오프닝곡",
+        "개굴개굴개구리",
+        "거미가 줄을타고",
+        "나비야 나비야",
+        "곰 세마리",
+        "달팽이 집을 지읍시다",
+        "엄마 돼지 아기 돼지",
+        "머리 어깨 무릎 발"
+      ]
+    }
+  ];
+}
+
+function saveSeriesList(list) {
+  try {
+    localStorage.setItem(SERIES_STORAGE_KEY, JSON.stringify(list));
+  } catch (e) {}
+  renderSavedSeriesUI();
+}
+
+function initSeriesStorageHandlers() {
+  const btnSave = document.getElementById('btn-save-series');
+  if (btnSave) {
+    btnSave.addEventListener('click', () => {
+      const keywordsInput = document.getElementById('keywords-input');
+      const charInput = document.getElementById('character-name');
+      const lines = keywordsInput.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+
+      if (lines.length === 0) {
+        alert('저장할 키워드 목록을 먼저 입력해주세요.');
+        return;
+      }
+
+      let seriesName = charInput ? charInput.value.trim() : '';
+      if (!seriesName) {
+        seriesName = prompt('저장할 시리즈/캐릭터 이름을 입력하세요 (예: 타요의 씽씽극장, 핑크퐁 상어가족):', '');
+        if (!seriesName || !seriesName.trim()) return;
+        seriesName = seriesName.trim();
+        if (charInput) charInput.value = seriesName;
+      }
+
+      const list = getSavedSeriesList();
+      const existingIdx = list.findIndex(s => s.name === seriesName);
+      const newSeries = {
+        id: 'series_' + Date.now(),
+        name: seriesName,
+        character: seriesName,
+        keywords: lines,
+        savedAt: new Date().toLocaleDateString()
+      };
+
+      if (existingIdx >= 0) {
+        if (!confirm(`'${seriesName}' 시리즈가 이미 보관함에 있습니다. 최신 키워드로 덮어쓰시겠습니까?`)) {
+          return;
+        }
+        list[existingIdx] = newSeries;
+      } else {
+        list.push(newSeries);
+      }
+
+      saveSeriesList(list);
+      alert(`'${seriesName}' (총 ${lines.length}곡)이 내 시리즈 보관함에 성공적으로 저장되었습니다!`);
+    });
+  }
+
+  // 송북 탭의 시리즈 선택 드롭다운 변경 리스너
+  const songbookSeriesSelect = document.getElementById('songbook-series-select');
+  if (songbookSeriesSelect) {
+    songbookSeriesSelect.addEventListener('change', (e) => {
+      const selectedId = e.target.value;
+      if (!selectedId) return;
+      const list = getSavedSeriesList();
+      const series = list.find(s => s.id === selectedId);
+      if (series) {
+        applySeriesToSongbookAndEditor(series);
+      }
+    });
+  }
+
+  renderSavedSeriesUI();
+}
+
+function applySeriesToSongbookAndEditor(series) {
+  // 1. 1번 탭의 키워드 및 캐릭터 입력창에 반영
+  const keywordsInput = document.getElementById('keywords-input');
+  const charInput = document.getElementById('character-name');
+  if (keywordsInput) {
+    keywordsInput.value = series.keywords.join('\n');
+    // 라인 번호 및 카운트 갱신 트리거
+    const lines = series.keywords;
+    const lineNumbers = document.getElementById('line-numbers');
+    const countBadge = document.getElementById('keyword-count-badge');
+    if (countBadge) countBadge.textContent = `${lines.length}곡 입력됨`;
+    if (lineNumbers) {
+      let nums = '';
+      for (let i = 1; i <= Math.max(lines.length, 1); i++) nums += i + '\n';
+      lineNumbers.textContent = nums;
+    }
+  }
+  if (charInput) {
+    charInput.value = series.character || series.name;
+  }
+
+  // 2. 송북 타이틀 기본값 반영 (사용자가 언제든 수정 가능)
+  const bookTitleInput = document.getElementById('book-title');
+  const newTitle = `${series.name} 사운드 카드`;
+  state.songbookSettings.title = newTitle;
+  if (bookTitleInput) bookTitleInput.value = newTitle;
+
+  // 3. 송북 카드 생성 (키워드 순차 매핑)
+  const prefix = 'REC1_';
+  state.songbookItems = series.keywords.map((kw, idx) => {
+    const codeNum = 1000 + idx;
+    const paddedNum = String(codeNum).padStart(4, '0');
+    return {
+      id: `${prefix}${paddedNum}`,
+      title: kw,
+      saypen_code: `${prefix}${paddedNum}`,
+      thumb_url: `https://placehold.co/320x180/e2e8f0/475569?text=${encodeURIComponent(kw)}`
+    };
+  });
+
+  renderSongbookPages();
+}
+
+function renderSavedSeriesUI() {
+  const container = document.getElementById('saved-series-container');
+  const chipsWrap = document.getElementById('saved-series-chips');
+  const songbookSelect = document.getElementById('songbook-series-select');
+  const list = getSavedSeriesList();
+
+  if (!chipsWrap) return;
+
+  if (list.length === 0) {
+    if (container) container.classList.add('hidden');
+  } else {
+    if (container) container.classList.remove('hidden');
+    chipsWrap.innerHTML = '';
+    list.forEach(series => {
+      const chip = document.createElement('div');
+      chip.style.cssText = 'display: inline-flex; align-items: center; background: var(--bg-main); border: 1px solid var(--border); border-radius: 20px; padding: 2px 8px 2px 10px; font-size: 0.82rem; gap: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);';
+      
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = `📂 ${series.name} (${series.keywords.length}곡)`;
+      btn.style.cssText = 'background: none; border: none; font-size: 0.82rem; font-weight: 600; color: var(--primary); cursor: pointer; padding: 0;';
+      btn.title = `클릭하면 '${series.name}' 키워드 목록을 불러옵니다.`;
+      btn.addEventListener('click', () => {
+        applySeriesToSongbookAndEditor(series);
+        alert(`'${series.name}' (총 ${series.keywords.length}곡)을 불러왔습니다! 이제 [상위 3개 영상 후보 검색하기]를 누르시면 됩니다.`);
+      });
+
+      const delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.innerHTML = '&times;';
+      delBtn.style.cssText = 'background: none; border: none; font-size: 0.95rem; line-height: 1; color: var(--text-muted); cursor: pointer; padding: 0 2px;';
+      delBtn.title = '이 시리즈 보관함에서 삭제';
+      delBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (confirm(`'${series.name}' 시리즈를 보관함에서 삭제하시겠습니까?`)) {
+          const updated = list.filter(s => s.id !== series.id);
+          saveSeriesList(updated);
+        }
+      });
+
+      chip.appendChild(btn);
+      chip.appendChild(delBtn);
+      chipsWrap.appendChild(chip);
+    });
+  }
+
+  // 송북 탭 셀렉트박스 갱신
+  if (songbookSelect) {
+    const currentVal = songbookSelect.value;
+    songbookSelect.innerHTML = '<option value="">-- 내 보관함 시리즈 선택 --</option>';
+    list.forEach(series => {
+      const opt = document.createElement('option');
+      opt.value = series.id;
+      opt.textContent = `📁 ${series.name} (${series.keywords.length}곡)`;
+      songbookSelect.appendChild(opt);
+    });
+    songbookSelect.value = currentVal;
+  }
+}
+
 

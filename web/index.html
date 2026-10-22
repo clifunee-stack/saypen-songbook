@@ -67,8 +67,22 @@
                 <label for="keywords-input"><strong>검색 키워드 목록</strong> (한 줄에 하나씩 입력)</label>
                 <span id="keyword-count-badge" class="badge badge-info">0곡 입력됨</span>
               </div>
-              <button type="button" id="btn-load-sample" class="btn-text">💡 뽀로로 예시 불러오기</button>
+              <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                <button type="button" id="btn-save-series" class="btn btn-outline" style="font-size: 0.82rem; padding: 0.3rem 0.75rem;" title="현재 입력된 캐릭터 이름과 키워드 목록을 나만의 시리즈로 저장합니다.">💾 이 시리즈 저장하기</button>
+                <button type="button" id="btn-load-sample" class="btn-text">💡 뽀로로 예시</button>
+              </div>
             </div>
+
+            <!-- 저장된 시리즈 빠른 선택 보관함 (localStorage 연동) -->
+            <div id="saved-series-container" class="saved-series-wrap hidden" style="margin-bottom: 0.6rem; padding: 0.5rem 0.75rem; background: var(--bg-card); border-radius: 8px; border: 1px dashed var(--primary); display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+              <span style="font-size: 0.85rem; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 0.3rem;">
+                <span>📂</span> 내 시리즈 보관함:
+              </span>
+              <div id="saved-series-chips" style="display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center;">
+                <!-- JS로 동적 렌더링 -->
+              </div>
+            </div>
+
             <div class="editor-wrap">
               <div id="line-numbers" class="line-numbers">1</div>
               <textarea id="keywords-input" rows="7" placeholder="다운로드할 노래 제목이나 키워드를 줄바꿈으로 입력하세요.&#10;예시:&#10;뽀롱뽀롱 뽀로로 오프닝곡&#10;개굴개굴개구리&#10;거미가 줄을타고&#10;나비야 나비야&#10;곰 세마리&#10;달팽이 집을 지읍시다&#10;엄마 돼지 아기 돼지&#10;머리 어깨 무릎 발"></textarea>
@@ -211,6 +225,13 @@
         </div>
 
         <div class="songbook-controls-grid">
+          <div class="control-item" id="songbook-series-select-wrap">
+            <label for="songbook-series-select"><strong>📂 저장된 시리즈 불러오기</strong></label>
+            <select id="songbook-series-select">
+              <option value="">-- 내 보관함 시리즈 선택 --</option>
+            </select>
+          </div>
+
           <div class="control-item">
             <label for="book-title"><strong>카드 상단 타이틀 (Title)</strong></label>
             <input type="text" id="book-title" value="뽀로로 사운드 카드" placeholder="예: 뽀로로 사운드 카드">
