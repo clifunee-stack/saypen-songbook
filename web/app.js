@@ -316,28 +316,60 @@ function initDownloadHandlers() {
     btnStartDownload.disabled = true;
     if (btnStartDownloadBottom) btnStartDownloadBottom.disabled = true;
 
-    progressBarFill.style.width = '10%';
-    progressPercent.textContent = '10%';
-    progressCurrentItem.textContent = `총 ${itemsToDownload.length}곡 다운로드 준비 중...`;
+    const totalItems = itemsToDownload.length;
+    const allResults = [];
 
     try {
-      const response = await fetch('/api/download', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: itemsToDownload })
-      });
+      for (let i = 0; i < totalItems; i++) {
+        const currentItem = itemsToDownload[i];
+        const currentStep = i + 1;
+        const leftCount = totalItems - currentStep;
+        const percentVal = Math.round((i / totalItems) * 100);
 
-      const data = await response.json();
-      if (data.status !== 'ok') {
-        throw new Error(data.message || '다운로드 실패');
+        progressBarFill.style.width = `${percentVal}%`;
+        progressPercent.textContent = `${percentVal}%`;
+        progressCurrentItem.textContent = `총 ${totalItems}곡 중 ${currentStep}번째 음원 변환 중: "${currentItem.keyword}" (${leftCount}곡 남음)`;
+
+        try {
+          const response = await fetch('/api/download', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ items: [currentItem] })
+          });
+
+          const data = await response.json();
+          if (data.status === 'ok' && data.results && data.results.length > 0) {
+            allResults.push(data.results[0]);
+          } else {
+            allResults.push({
+              success: false,
+              keyword: currentItem.keyword,
+              saypen_code: currentItem.saypen_code,
+              youtube_title: currentItem.title,
+              error_message: (data && data.message) || '다운로드 실패',
+              mp3_file: `${currentItem.saypen_code}.mp3`,
+              jpg_file: `${currentItem.saypen_code}.jpg`
+            });
+          }
+        } catch (itemErr) {
+          allResults.push({
+            success: false,
+            keyword: currentItem.keyword,
+            saypen_code: currentItem.saypen_code,
+            youtube_title: currentItem.title,
+            error_message: itemErr.message,
+            mp3_file: `${currentItem.saypen_code}.mp3`,
+            jpg_file: `${currentItem.saypen_code}.jpg`
+          });
+        }
       }
 
       progressBarFill.style.width = '100%';
       progressPercent.textContent = '100%';
-      progressCurrentItem.textContent = '완료되었습니다!';
+      progressCurrentItem.textContent = '모든 다운로드 및 변환이 완료되었습니다!';
 
       // 다운로드 완료 결과 처리
-      const results = data.results || [];
+      const results = allResults;
       const successCount = results.filter(r => r.success).length;
       const failCount = results.length - successCount;
 
