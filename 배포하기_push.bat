@@ -17,10 +17,10 @@ echo [1/3] Adding modified files...
 git add .
 
 echo [2/3] Committing changes...
-git commit -m "Update saypen songbook app with character search"
+git commit -m "Update saypen songbook app with character search" 2>nul
 
-echo [3/3] Pushing to GitHub...
-git push -u origin main
+echo [3/3] Pushing to GitHub (Force Sync)...
+git push -u origin main --force
 
 echo.
 echo ========================================================
