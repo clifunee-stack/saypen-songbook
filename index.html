@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#f8fafc">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<title>타요의 씽씽극장 썸네일 송북 도구</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- 웹폰트: 둥글둥글 귀여운 동요/송북용 나눔스퀘어라운드, 주아체, 카페24써라운드, 프리텐다드 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/innks/NanumSquareRound@master/nanumsquareround.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+<style>
+@font-face {
+  font-family: 'Cafe24Ssurround';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/Cafe24Ssurround.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+:root{
+  --ink:#1e293b;--muted:#64748b;--line:#e2e8f0;--primary:#0f172a;--tayo-blue:#0284c7;--tayo-red:#ef4444;--bg:#f8fafc;
+  --title-font: 'NanumSquareRound', 'Pretendard', sans-serif;
+}
+
+/* 글씨체 테마 클래스 */
+body.font-round { --title-font: 'NanumSquareRound', 'Pretendard', sans-serif; }
+body.font-jua { --title-font: 'Jua', 'NanumSquareRound', sans-serif; }
+body.font-ssurround { --title-font: 'Cafe24Ssurround', 'NanumSquareRound', sans-serif; }
+body.font-pretendard { --title-font: 'Pretendard', sans-serif; }
+body.font-system { --title-font: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; }
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Pretendard',-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+main{max-width:1100px;margin:0 auto;padding:16px 14px 48px}
+.panel{background:white;border:1px solid var(--line);border-radius:14px;padding:16px;margin:12px 0}
+h1{font-size:24px;text-align:center;margin:6px 0 4px;font-weight:800;letter-spacing:-.03em;font-family:var(--title-font)}
+.sub{text-align:center;color:var(--muted);font-size:12px;margin:0 0 16px}
+h2{font-size:16px;margin:0 0 10px}
+label{display:block;font-size:13px;font-weight:650;margin-bottom:6px}
+input,textarea,select,button{font:inherit}
+input[type=text],input[type=url],input[type=password],textarea,select{width:100%;border:1px solid #cbd5e1;border-radius:8px;padding:9px 11px;background:#fff;color:var(--ink)}
+textarea{min-height:130px;resize:vertical;font-size:13px;line-height:1.5}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{border:1px solid #cbd5e1;background:white;border-radius:8px;padding:8px 13px;cursor:pointer;font-weight:650;transition:all 0.15s;font-size:13px}
+.btn:hover{background:#f1f5f9}
+.btn.primary{background:#0f172a;color:white;border-color:#0f172a}
+.btn.primary:hover{background:#334155}
+.btn.accent{background:#ef4444;color:white;border-color:#ef4444}
+.btn.accent:hover{background:#dc2626}
+.btn.success{background:#059669;color:white;border-color:#059669}
+.btn.success:hover{background:#047857}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.hint{font-size:12px;color:var(--muted);line-height:1.5}
+
+/* 앨범명 입력 필드 글씨체 */
+#album {
+  font-family: var(--title-font);
+  font-weight: 700;
+  font-size: 14.5px;
+  letter-spacing: -0.02em;
+}
+
+/* 수록곡 행 번호 표시 */
+.line-numbers{
+  width:40px;
+  background:#f8fafc;
+  border-right:1px solid #cbd5e1;
+  color:#94a3b8;
+  font-family:'Consolas','Courier New',monospace;
+  font-size:13px;
+  line-height:1.5;
+  padding:9px 6px;
+  text-align:right;
+  user-select:none;
+  white-space:pre-wrap;
+  overflow:hidden;
+}
+
+/* 수록곡 목록 */
+.tracklist{display:grid;gap:6px}
+.track{display:grid;grid-template-columns:26px 1fr auto;gap:10px;align-items:center;border:1px solid var(--line);padding:8px 12px;border-radius:8px;background:#fff}
+.track input[type=checkbox]{width:16px;height:16px;cursor:pointer}
+.track .name{font-weight:700;font-size:13.5px;font-family:var(--title-font);letter-spacing:-0.02em}
+.track .num{color:var(--muted);font-size:12px;font-weight:700}
+
+/* 유튜브 후보 카드 스타일 (우리 방식: 16:9 비율 유지 + object-fit: cover, 왜곡 scale 제거) */
+.candidates{display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:12px;margin-top:12px}
+.candidate{border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff;display:flex;flex-direction:column}
+.candidate .thumb-box{width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:6px;background:#e2e8f0;position:relative}
+.candidate .thumb-box img{width:100%;height:100%;object-fit:cover;display:block;border-radius:6px}
+.candidate h3{font-size:13px;line-height:1.4;margin:8px 0 4px;overflow-wrap:anywhere;font-family:var(--title-font);font-weight:700}
+.candidate .meta{font-size:11px;color:var(--muted);margin-bottom:8px}
+.candidate .pick{display:flex;gap:8px;margin-top:auto;padding-top:8px;border-top:1px solid var(--line);font-size:12px;align-items:center;justify-content:space-between}
+.candidate .pick label{display:inline-flex;align-items:center;gap:4px;cursor:pointer;margin:0}
+
+/* ========================================================== */
+/* A5 송북 디자인 (상단 헤드라인 제외, 깔끔한 2열 4행 그리드)     */
+/* ========================================================== */
+.songbooks-container{
+  display:flex;
+  flex-direction:column;
+  gap:24px;
+  align-items:center;
+}
+
+/* 1개의 독립된 송북 카드 (A5 규격) */
+.single-songbook{
+  border:1px dashed #94a3b8;
+  border-radius:14px;
+  padding:16px 14px 18px;
+  background:#ffffff;
+  width:100%;
+  max-width:440px;
+  box-shadow:0 4px 18px rgba(0,0,0,0.05);
+  display:flex;
+  flex-direction:column;
+}
+
+/* 2열 4행 그리드 (최대 8개) */
+.songbook-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  grid-template-rows:repeat(4, minmax(0, 1fr));
+  gap:12px 10px;
+  flex:1;
+}
+
+/* 각 곡 항목 */
+.song-item{
+  border:none;
+  padding:0;
+  margin:0;
+  background:transparent;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+}
+
+/* 썸네일 컨테이너: 우리 크롭 방식 (16:9 비율 유지 + object-fit: cover, 왜곡 scale 제거) */
+.thumb-crop{
+  width:100%;
+  aspect-ratio:16/9;
+  overflow:hidden;
+  border-radius:6px;
+  position:relative;
+  background:#e2e8f0;
+  box-shadow:0 1px 3px rgba(0,0,0,0.08);
+}
+.thumb-crop img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+  border-radius:6px;
+}
+.thumb-crop .missing{
+  width:100%;
+  height:100%;
+  display:grid;
+  place-items:center;
+  font-size:11px;
+  color:var(--muted);
+  border:1px dashed #cbd5e1;
+  border-radius:6px;
+}
+
+/* 곡 제목: 둥글고 귀여운 맞춤 글씨체 적용 */
+.song-item .song-title{
+  font-family: var(--title-font);
+  font-size: 12.5px;
+  font-weight: 800;
+  line-height: 1.25;
+  margin-top: 6px;
+  color: #1e293b;
+  overflow-wrap: anywhere;
+  word-break: keep-all;
+  text-align: center;
+  letter-spacing: -0.02em;
+}
+
+/* 송북별 액션 버튼 */
+.songbook-actions{
+  margin-top:14px;
+  padding-top:10px;
+  border-top:1px solid #f1f5f9;
+  display:flex;
+  gap:6px;
+  justify-content:flex-end;
+}
+
+/* MP3 모달 */
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:9999;padding:12px}
+.modal-box{background:white;border-radius:14px;max-width:540px;width:100%;max-height:85vh;overflow-y:auto;padding:20px;box-shadow:0 8px 30px rgba(0,0,0,0.25)}
+.mp3-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);gap:10px}
+.mp3-btn-group{display:flex;gap:4px;flex-shrink:0}
+
+/* 인쇄 및 PDF 저장 시 적용 */
+@media print{
+  @page{size:A4 portrait;margin:8mm}
+  html,body{background:white!important;margin:0!important;padding:0!important}
+  main{max-width:none!important;margin:0!important;padding:0!important}
+  .no-print,header,.sub,.panel:not(#previewPanel),.songbook-actions{display:none!important}
+  #previewPanel{border:0!important;padding:0!important;margin:0!important;background:transparent!important}
+  .songbooks-container{display:block!important}
+  .single-songbook{page-break-after:always;border:1px dashed #000!important;max-width:none!important;margin:0 0 12mm 0!important;box-shadow:none!important;padding:8mm!important}
+  .thumb-crop img{-webkit-print-color-adjust:exact;print-color-adjust:exact;object-fit:cover!important}
+  .song-item .song-title{font-family:var(--title-font)!important;font-weight:800!important}
+}
+</style>
+</head>
+<body class="font-round"><main>
+<header class="no-print">
+  <h1>타요의 씽씽극장 썸네일 송북 도구</h1>
+  <p class="sub">상단 헤드라인 제외 · 입력 행 번호 표시 · 16:9 썸네일 크롭 · 감성 글씨체 선택 · 후보 일괄 조회</p>
+</header>
+
+<section class="panel no-print">
+  <h2>1. 앨범명, 글씨체 및 수록곡 목록</h2>
+  <div class="grid">
+    <div>
+      <label for="album"><strong>캐릭터 / 앨범명</strong> (검색 접두사)</label>
+      <input id="album" type="text" value="타요의 씽씽극장" placeholder="예: 타요의 씽씽극장, 뽀로로와 노래해요">
+      <span class="hint" style="font-size:11px;color:var(--muted);margin-top:3px;display:block">
+        💡 유튜브 검색 시 각 곡 제목 앞에 붙여서 최적의 영상을 찾아줍니다.
+      </span>
+    </div>
+    <div>
+      <label for="fontSelect"><strong>🔤 글씨체 (폰트 선택)</strong></label>
+      <select id="fontSelect" style="font-weight:700;cursor:pointer">
+        <option value="round" selected>🎈 나눔스퀘어라운드 (동글동글 귀여운 동요체 - 추천)</option>
+        <option value="jua">🧸 배달의민족 주아체 (통통 튀는 깜찍한 서체)</option>
+        <option value="ssurround">✨ 카페24 써라운드 (동글 꽉 찬 볼드체)</option>
+        <option value="pretendard">📱 프리텐다드 (세련되고 또렷한 고딕체)</option>
+        <option value="system">🖥️ 기본 고딕체</option>
+      </select>
+      <span class="hint" style="font-size:11px;color:var(--muted);margin-top:3px;display:block">
+        💡 선택하신 글씨체가 앨범명, 곡명, 송북 인쇄 카드에 즉시 실시간 적용됩니다.
+      </span>
+    </div>
+  </div>
+
+  <div style="margin-top:12px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <label for="songs" style="margin:0;font-weight:700">수록곡 목록 (한 줄에 한 곡)</label>
+      <span id="songsCountBadge" style="font-size:12px;font-weight:700;color:var(--tayo-blue);background:#e0f2fe;padding:2px 8px;border-radius:12px">15곡 입력됨</span>
+    </div>
+    <div class="editor-wrap" style="position:relative;display:flex;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden;background:#fff">
+      <div id="lineNumbers" class="line-numbers">1</div>
+      <textarea id="songs" style="flex:1;border:none;border-radius:0;padding:9px 11px;min-height:170px;resize:vertical;font-size:13px;line-height:1.5;outline:none;font-family:inherit">오프닝
+꼬마버스가 출발합니다
+용감한 자동차들
+주룩주룩 첨벙첨벙
+천하장사 중장비
+뚝딱뚝딱 만능 정비사
+꿈나라로 쿨쿨쿨
+많이 많이 닮았네
+정다운 시골여행
+반짝반짝 상쾌한 하루
+행복을 배달해요
+푸른 하늘 높이
+환상의 우주 여행
+아침이 밝았어요
+엔딩</textarea>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top:10px">
+    <button class="btn primary" id="apply" style="font-weight:700;font-size:13.5px">🔍 유튜브 후보 찾기</button>
+    <button class="btn" id="all">전체 선택</button>
+    <button class="btn" id="none">전체 해제</button>
+    <button class="btn" id="csvin">CSV 불러오기</button>
+    <input id="csvfile" type="file" accept=".csv,text/csv" hidden>
+  </div>
+  <div id="batchSearchStatus" style="display:none;margin-top:10px;padding:10px 14px;background:#e0f2fe;border:1px solid #bae6fd;border-radius:8px;font-size:13px;color:#0369a1;font-weight:600"></div>
+</section>
+
+<section class="panel no-print">
+  <h2>2. 수록곡 목록 · 추출 여부 선택</h2>
+  <div id="tracklist" class="tracklist"></div>
+</section>
+
+<section class="panel no-print">
+  <h2>3. 곡별 유튜브 후보 지정</h2>
+  <div style="margin-bottom:14px">
+    <label for="ytkey">YouTube Data API v3 키 (선택 사항)</label>
+    <input id="ytkey" type="password" autocomplete="off" placeholder="로컬 서버 미사용 시 YouTube API 키 입력 (1회 입력 시 자동 보관)">
+    <p class="hint">자체 서버(/api/search) 환경에서는 키 없이 바로 검색되며, 단독 실행 시 API 키를 입력해 두시면 영구 보존됩니다.</p>
+  </div>
+  <div id="candidateEditor"></div>
+</section>
+
+<section class="panel" id="previewPanel">
+  <div class="row no-print" style="justify-content:space-between;margin-bottom:12px">
+    <h2 style="margin:0">송북 미리보기 (상단 헤드라인 제외 · 2열 4행 A5)</h2>
+    <span id="count" style="font-size:12px;font-weight:700;color:var(--tayo-blue);background:#e0f2fe;padding:4px 8px;border-radius:6px">0곡 선택</span>
+  </div>
+  
+  <div id="previewContainer" class="songbooks-container"></div>
+
+  <div class="row no-print" style="margin-top:20px;gap:8px">
+    <button class="btn success" id="downloadAllPdfBtn" style="font-size:14px;font-weight:750">📄 전체 송북 PDF 다운로드</button>
+    <button class="btn primary" id="downloadAllImgBtn" style="font-size:14px;font-weight:750">🖼️ 전체 송북 이미지(PNG) 저장</button>
+    <button class="btn accent" id="downloadMp3Btn">🎵 선택 음원 MP3 다운로드</button>
+    <button class="btn" id="savePreviewHtml">송북 HTML 저장</button>
+    <button class="btn" id="savecsv">CSV 저장</button>
+    <button class="btn" id="print">인쇄 창 열기</button>
+  </div>
+</section>
+</main>
+
+<div class="modal-overlay" id="mp3Modal">
+  <div class="modal-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <h3 style="margin:0;font-size:17px">🎵 MP3 음원 파일 다운로드</h3>
+      <button class="btn" onclick="$('mp3Modal').style.display='none'">닫기</button>
+    </div>
+    <p class="hint" style="margin-top:0">원하시는 곡의 다운로드 채널을 누르시면 MP3 변환 페이지로 바로 이동합니다.</p>
+    <div id="mp3List" style="margin:12px 0"></div>
+    <div class="row" style="justify-content:space-between;margin-top:14px;gap:6px">
+      <button class="btn" id="downloadUrlTxt">URL 목록 텍스트</button>
+      <button class="btn primary" id="downloadPyScript">파이썬 원클릭 전곡 다운로드(.py)</button>
+      <button class="btn" id="downloadBatScript">윈도우 배치파일(.bat)</button>
+    </div>
+  </div>
+</div>
+
+<script src="./app.js"></script>
+</body>
+</html>
